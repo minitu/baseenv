@@ -1,0 +1,188 @@
+#! /usr/bin/env perl
+#
+# Merge the results (from mergetests) of multiple compilers on the same
+# platform.  This provides a quick snapshot of the vectorization abilities
+# of the available compilers, and provides a comparison based on the
+# performance of the compilers
+#
+# mergesheets name1:file1 name2:file2 ...
+#
+# where namei is the name of the compiler for the ith file (used to label the
+# columns in the output)
+#
+# Each input sheet has the format
+#   testname vectortime novectortime speedup checksum-diff description
+# The output has the format
+#   testname v1 nv1 v2 nv2 ... index-of-fastest-v index-of-fastest-nv number-of-compilers-that-vectorized description
+# In addition, a summary is provided giving:
+#   For each compiler, number of times it was fastest for vector
+#   For each compiler, number of times if was fastest for non-vector
+#   For each compiler, number of tests vectorized
+#   For each compiler, number of test not vectorized
+# For the purposes of these results, vectorization means that the vector time
+# was at least 10% faster than the non-vector time.
+#   (We also count the number of times the vector version is more than 10%
+#   slower)
+#
+$verbose = 0;
+# Read command line to get the input files
+@inputfiles = ();
+@inputnames = ();
+foreach $arg (@ARGV) {
+    if ($arg =~ /(\w+):(.*)/) {
+	$name = $1;
+	$file = $2;
+	if (-s $file) {
+	    $inputfiles[$#inputfiles+1] = $file;
+	    $inputnames[$#inputnames+1] = $name;
+	}
+	else {
+	    print STDERR "File $file does not exist or is empty\n";
+	}
+    }
+    else {
+	print STDERR "Unrecognized argument $arg\n";
+	exit 1;
+    }
+}
+#
+# For each file:
+#   Read the file, saving the results in a hash indexed by test name
+#   The first time, keep an array containing the test names as values (so
+#   that we can output the results in the same order as input)
+@testnames = ();
+@testdesc = ();
+for ($i=0; $i<=$#inputfiles; $i++) {
+    print "Opening $inputfiles[$i]\n" if $verbose;
+    open(FD, "<$inputfiles[$i]") || die "Could not open $inputfiles[$i]\n";
+    # Skip header
+    while (<FD>) {
+	if (/^Test\s/) { last; }
+    }
+    $name = $inputnames[$i];
+    $vecname = $name . "vec";
+    $novecname = $name . "novec";
+    %$vecname = ();
+    %$novecname = ();
+    # Read all of the data and store the data we want in several hashes
+    while (<FD>) {
+        chomp;
+	($test,$vectime,$novec,$speedup,$checksum,$desc) = split(/\t/);
+	if ($i == 0) {
+	    $testnames[$#testnames+1] = $test;
+	    $testdesc[$#testdesc+1]   = $desc;
+	}
+	$$vecname{$test} = $vectime;
+	$$novecname{$test} = $novec;
+    }
+    close(FD);
+}
+#
+# Once we've read all of the data, output the data
+print "Found $#testnames tests\n" if $verbose;
+# Print the header
+print "Test";
+for ($j=0; $j<=$#inputnames; $j++) {
+    print "\t" . $inputnames[$j] . "\t";
+}
+print "\tfastest vec\tfastest nonvec\tdesc\n";
+@vectorized = ();
+@fastestvec = ();
+@fastestnovec = ();
+%vectorizedBy = ();
+
+# Also keep track of times that the vectorized version was significantly slower
+@vecslower = ();
+%vecslowerBy = ();
+
+for ($j=0; $j<=$#testnames; $j++) {
+    $test = $testnames[$j];
+    print $test;
+    # Find the best vectorized and non-vectorized in each test
+    $minvectime = 1e10;
+    $minnovectime = 1e10;
+    $minvecloc = -1;
+    $minnovecloc = -1;
+    $vectorizedBy{$test} = "";
+    for ($i=0; $i<=$#inputnames; $i++) {
+	$name = $inputnames[$i];
+	$vecname = $name . "vec";
+	$novecname = $name . "novec";
+	if (defined($$vecname{$test})) {
+	    $vectime = $$vecname{$test};
+	    $novectime = $$novecname{$test};
+	    print "\t" . $vectime . "\t" . $novectime;
+	    if ($vectime < 0.9*$novectime) {
+		$vectorized[$i]++;
+		$vectorizedBy{$test} .= "$i,";
+	    }
+	    elsif ($vectime > 1.1*$novectime) {
+		$vecslower[$i]++;
+		$vecslowerBy{$test} .= "$i,";
+	    }
+	    if ($vectime < $minvectime) {
+		$minvectime = $vectime;
+		$minvecloc  = $i;
+	    }
+	    if ($novectime < $minnovectime) {
+		$minnovectime = $novectime;
+		$minnovecloc  = $i;
+	    }
+	}
+	else {
+	    print "\t0\t0";
+	}
+    }
+    # Which compiler won this test?
+
+    print "\t" . $minvecloc . "\t" . $minnovecloc;
+    print "\t$testdesc[$j]\n";
+    $fastestvec[$minvecloc] ++;
+    $fastestnovec[$minnovecloc] ++;
+}
+#
+# Postpend a summary
+# 1) Summary of how many loops each compiler vectorized, and how often
+#    that compiler found the best vectorization
+for ($i=0; $i<=$#vectorized; $i++) {
+    print $inputnames[$i] . " vectorized " . $vectorized[$i];
+    print " loops, fastest " . $fastestvec[$i] . " times\n";
+    print " vectorized code slower then unvectorized " . $vecslower[$i] .
+	" times\n";
+}
+
+# 2) Summary of how well the compilers did by test
+%venncount = ();
+@byTestCount = ();
+for ($i=0; $i<=$#inputfiles; $i++) {
+    $byTestCount[$i] = 0;
+}
+print "Summary of how many loops vectorized by compiler\n";
+foreach $key (keys(%vectorizedBy)) {
+    print "list of compilers that vectorized $key = $vectorizedBy{$key}\n" if $verbose;
+    $compilerList = $vectorizedBy{$key};
+    if (!defined($venncount{$compilerList})) {
+	$venncount{$compilerList} = 1;
+    }
+    else {
+	$venncount{$compilerList}++;
+    }
+    @list = split(/,/,$compilerList);
+    print "$vectorsizedBy{$key} has ", $#list+1, " members\n" if $verbose;
+    $byTestCount[$#list+1]++;
+}
+
+foreach $key (sort(keys(%venncount))) {
+    @idx = split(/,/,$key);
+    if ($#idx == -1) {
+	print "none";
+    }
+    for ($i=0; $i<=$#idx; $i++) {
+	print $inputnames[$idx[$i]];
+	if ($i < $#idx) { print ", "; }
+    }
+    print "\t" . $venncount{$key} . "\n";
+}
+
+
+

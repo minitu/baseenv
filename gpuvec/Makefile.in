@@ -1,0 +1,145 @@
+ALL: all-redirect
+
+# Set the basic directories
+prefix           = @prefix@
+exec_prefix      = @exec_prefix@
+datarootdir      = @datarootdir@
+libdir           = @libdir@
+abs_builddir     = @abs_builddir@
+abs_top_builddir = @abs_top_builddir@
+builddir         = @builddir@
+top_builddir     = @top_builddir@
+abs_srcdir       = @abs_srcdir@
+abs_top_srcdir   = @abs_top_srcdir@
+
+master_top_builddir = @master_top_builddir@
+master_top_srcdir   = @master_top_srcdir@
+include $(master_top_srcdir)/Makefile.doc
+
+CC       = @CC@
+CFLAGS   = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@ -I..
+LDFLAGS  = @LDFLAGS@
+EXTRA_LIBS = @BASEENV_LIB@ @LIBS@
+SUBDIRS =
+
+MKDIR_P = @MKDIR_P@
+DOCTEXT = @DOCTEXT@
+
+# Makefile.vec contains the options to select vectorization by the compiler.
+include $(master_top_srcdir)/Makefile.vec
+# Eventually move Makefile.acc into top_srcdir
+include Makefile.acc
+
+GENERATEDFILES =
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+.c.o:
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(OPTFLAGS) $(VECFLAGS) $(VECLIST) $<
+
+gpuvec_HEADERS  = gpuvec.h
+gpuvec_SOURCES  = gpuvec.c dummy.c
+gpuvec_OBJECTS  = gpuvec$(PGMSUFFIX).o dummy.o
+gpuvec_acc_OBJECTS = gpuvec-acc$(PGMSUFFIX).o dummy-acc.o
+
+SOURCES      = $(gpuvec_SOURCES)
+HEADER_FILES = $(gpuvec_HEADERS)
+DIST_COMMON  = Makefile.in Makefile.acc runtests runtests.sbatch runtests.bw
+DOC_FILES    = README
+DOC_SOURCES  = gpuvec.c
+
+# Use
+#   make PGMSUFFIX=-double CPPFLAGS=-DBASETYPE=double
+# for the double precision version
+EXECS = gpuvec$(PGMSUFFIX) gpuvec-acc$(PGMSUFFIX)
+
+# A list of the executables from runtests
+ALLEXECS = gpuvec-acc gpuvec-acc-gpu \
+	gpuvec-acc-double gpuvec-acc-gpu-double \
+	gpuvec-acc-len256k gpuvec-acc-gpu-len256k \
+	gpuvec-acc-double-len256k gpuvec-acc-gpu-double-len256k \
+	gpuvec-dyn gpuvec-double-dyn \
+	gpuvec-acc-gpu-dyn gpuvec-acc-double-gpu-dyn \
+	gpuvec-len256k gpuvec-double gpuvec-double-len256k \
+	gpuvec-acc-gpu-kernel gpuvec-acc-gpu-kernel-double \
+	gpuvec-acc-gpu-kernel-len256k gpuvec-acc-gpu-kernel-double-len256k
+
+all-redirect: $(EXECS)
+
+baseenvprogs: $(EXECS)
+	@for dir in $(SUBDIRS) ; do\
+	    (cd $$dir && $(MAKE) baseenvprogs) ; \
+	done
+baseenvlib:
+
+Makefile: Makefile.in ../config.status
+	(cd .. && ./config.status --file=gpuvec/Makefile)
+../config.status: ../configure.ac
+	(cd .. && ./autogen.sh)
+
+# gpuvec for the host
+gpuvec$(PGMSUFFIX): $(gpuvec_OBJECTS)
+	$(CC) $(CFLAGS) $(OPTFLAGS) $(CPPFLAGS) -o gpuvec$(PGMSUFFIX) \
+		$(gpuvec_OBJECTS) $(EXTRA_LIBS)
+
+#gpuvec for the accelerator
+gpuvec-acc$(PGMSUFFIX): $(gpuvec_acc_OBJECTS)
+	$(CC) $(ACCFLAGS) $(CFLAGS) $(OPTFLAGS) $(CPPFLAGS) \
+		-o gpuvec-acc$(PGMSUFFIX) $(gpuvec_acc_OBJECTS) $(EXTRA_LIBS)
+
+# Object files
+gpuvec$(PGMSUFFIX).o: gpuvec.c
+	$(CC) -c -o gpuvec$(PGMSUFFIX).o $(CFLAGS) $(OPTFLAGS) $(CPPFLAGS) \
+		$(VECFLAGS) $(VECLIST) $(EXTRAFLAGS) \
+		-DCOMPILE_OPTS="\"$(CFLAGS) $(OPTFLAGS) $(CPPFLAGS) $(VECFLAGS) $(EXTRAFLAGS)\"" \
+		gpuvec.c
+gpuvec-acc$(PGMSUFFIX).o: gpuvec.c
+	$(CC) -c -o gpuvec-acc$(PGMSUFFIX).o $(CFLAGS) $(OPTFLAGS) $(CPPFLAGS) \
+		 $(VECFLAGS) $(VECLIST) $(ACCFLAGS) $(ACCLIST) $(EXTRAFLAGS) \
+			-DCOMPILE_OPTS="\"$(CFLAGS) $(OPTFLAGS) $(CPPFLAGS) $(VECFLAGS) $(ACCFLAGS) $(EXTRAFLAGS)\"" \
+		gpuvec.c
+
+dummy.o: dummy.c
+	$(CC) -c -o dummy.o $(CFLAGS) $(OPTFLAGS) $(CPPFLAGS) $(VECFLAGS) \
+		 $(VECLIST) $(EXTRAFLAGS) dummy.c
+
+dummy-acc.o: dummy.c
+	$(CC) -c -o dummy-acc.o $(CFLAGS) $(OPTFLAGS) $(CPPFLAGS) $(VECFLAGS) \
+		 $(VECLIST) $(ACCFLAGS) $(ACCLIST) $(EXTRAFLAGS) \
+		-DUSE_ACC dummy.c
+
+clean:
+	rm -f *.o *~
+	@for dir in $(SUBDIRS) ; do (cd $$dir && $(MAKE) clean) ; done
+
+realclean: clean
+	rm -f $(EXECS) $(ALLEXECS)
+	@for dir in $(SUBDIRS) ; do (cd $$dir && $(MAKE) realclean) ; done
+
+distclean: realclean
+	for dir in $(SUBDIRS) ; do (cd $$dir && $(MAKE) distclean) ; done
+	rm -f config.log config.status $(GENERATEDFILES) *.a
+	rm -rf autom4te.cache
+
+dist:
+	@if [ "X$(distdir)" == "X" ] ; then echo "Set distdir" ; exit 1 ; fi
+	@if [ ! -d $(distdir) ] ; then mkdir $(distdir) ; fi
+	cp $(SOURCES) $(distdir)
+	cp $(HEADER_FILES) $(distdir)
+	cp $(DIST_COMMON) $(distdir)
+	for dir in $(SUBDIRS) ; do \
+		(cd $$dir && $(MAKE) distdir=../$(distdir)/$$dir dist ) ; done
+	if [ "X$(DOC_FILES)" != "X" ] ; then cp $(DOC_FILES) $(distdir) ; fi
+
+# Documentation targets
+mandoc: $(mandoc_path1) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_MAN_OPTIONS) -mpath $(mandoc_path1) -ext 1 \
+		$(DOC_SOURCES)
+htmldoc: $(htmldoc_path1) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_HTML_OPTIONS) -mpath $(htmldoc_path1) \
+		$(DOC_SOURCES)
+
+install:
+
+.PHONY: baseenvlib baseenvprogs clean realclean distclean

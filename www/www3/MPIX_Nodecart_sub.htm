@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPIX_Nodecart_sub</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPIX_Nodecart_sub"><H1>MPIX_Nodecart_sub</H1></A>
+Partitions a communicator into subgroups which form lower-dimensional Cartesian subgrids 
+<H2>Synopsis</H2>
+<PRE>
+int MPIX_Nodecart_sub(MPI_Comm comm, const int remain[], MPI_Comm *subcomm)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>comm </B><DD>communicator with Cartesian structure (handle)
+
+<DT><B>remain_dims </B><DD>the  <tt>i</tt>th entry of remain_dims specifies whether the <tt>i</tt>th
+dimension is kept in the subgrid (true) or is dropped (false) (logical
+vector)
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL><DT><B>newcomm </B> <DD> communicator containing the subgrid that includes the calling
+process (handle)
+</DL>
+<P>
+<H2>Note</H2>
+Needed for the snap CORAL benchmark - they use this instead of
+<tt>MPI_Cart_shift</tt> .
+</BODY></HTML>

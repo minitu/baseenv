@@ -1,0 +1,135 @@
+all: all-redirect
+
+# Set the basic directories
+prefix           = @prefix@
+exec_prefix      = @exec_prefix@
+datarootdir      = @datarootdir@
+libdir           = @libdir@
+abs_builddir     = @abs_builddir@
+abs_top_builddir = @abs_top_builddir@
+builddir         = @builddir@
+top_builddir     = @top_builddir@
+abs_srcdir       = @abs_srcdir@
+abs_top_srcdir   = @abs_top_srcdir@
+
+master_top_builddir = @master_top_builddir@
+master_top_srcdir   = @master_top_srcdir@
+include $(master_top_srcdir)/Makefile.doc
+
+MPI_DIR = @MPI_DIR@
+# Some systems may want to add -static to the MPICC line
+MPICC           = @MPICC@
+MPIFORT         = @MPIFORT@
+RANLIB          = @RANLIB@
+MKDIR_P         = @MKDIR_P@
+INSTALL         = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA    = @INSTALL_DATA@
+DOCTEXT         = @DOCTEXT@
+
+CPPFLAGS = @CPPFLAGS@ @DEFS@
+CFLAGS   = @CFLAGS@
+COPT     = @COPT@
+FCOPT    = @FCOPT@
+LDFLAGS  = @LDFLAGS@
+LIBS     = @LIBS@
+EXECS    = topotest
+SUBDIRS  =
+TOPO_LIB = @TOPO_LIB@
+
+GENERATEDFILES = topoconf.h
+
+SOURCES      = topodebug.c topoinfo.c topotest.c meshtopo.c \
+	nodegetaff.inc nodegetcpu.inc nodehwloc.inc \
+	nodempiname.inc nodempisplit.inc \
+	topobgq.inc topocray.inc topompisplit.inc topompiname.inc \
+	findcliques.c topodist.c
+HEADER_FILES = topoinfo.h topoimpl.h findcliques.h
+DIST_COMMON  = configure.ac configure Makefile.in aclocal.m4 topoconf.h.in
+DOC_FILES    = README
+DOC_SOURCES  = $(SOURCES) $(HEADER_FILES)
+
+# Default rules to force use of the MPI compilers
+.SUFFIXES:
+.SUFFIXES: .c .f .f90 .o
+.c.o:
+	$(MPICC) $(CFLAGS) $(COPT) $(CPPFLAGS) -c $<
+.f.o:
+	$(MPIFORT) $(FFLAGS) $(FCOPT) -c $<
+.f90.o: $?
+	$(MPIFORT) $(FFLAGS) $(FCOPT) -c $<
+
+default:
+
+# The default is to produce an object file and a test program
+all-redirect: $(EXECS)
+	@for dir in $(SUBDIRS) ; do\
+	    (cd $$dir && $(MAKE)) ; \
+	done
+
+topotest: topotest.o $(TOPO_LIB)
+	$(MPICC) $(LDFLAGS) -o topotest topotest.o $(TOPO_LIB) $(LIBS)
+# Only the test program needs the seq routines
+topotest.o: topotest.c topoinfo.h
+	$(MPICC) -c -I../seq $(CPPFLAGS) $(CFLAGS) $(COPT) $<
+
+# An option is to add this to the common library
+topoinfo.o: topoinfo.c topoinfo.h topocray.inc topobgq.inc nodehwloc.inc \
+	nodegetcpu.inc nodempisplit.inc nodempiname.inc topompisplit.inc \
+	topompiname.inc topoconf.h
+topodebug.o: topodebug.c topoinfo.h topoconf.h
+findcliques.o: findcliques.c topoconf.h findcliques.h
+
+topodist.o: topodist.c topoinfo.h topoconf.h
+
+# We use sleep to keep make from making incorrect decisions about whether
+# the library is up-to-date in some succeeding step
+$(TOPO_LIB): topoinfo.o topodebug.o findcliques.o topodist.o meshtopo.o
+	ar cr $(TOPO_LIB) $?
+	$(RANLIB) $(TOPO_LIB)
+	sleep 1
+
+baseenvlib: $(TOPO_LIB)
+baseenvprogs: $(EXECS)
+
+Makefile: Makefile.in config.status
+	./config.status
+
+# Documentation targets
+mandoc: $(mandoc_path3) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_MAN_OPTIONS) -mpath $(mandoc_path3) -ext 3 \
+		$(DOC_SOURCES)
+htmldoc: $(htmldoc_path3) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_HTML_OPTIONS) -mpath $(htmldoc_path3) \
+		$(DOC_SOURCES)
+
+clean:
+	rm -f *.o *.ps *.pdf *~ fpmpi_profile.txt *.chkpt
+	for dir in $(SUBDIRS) ; do (cd $$dir && $(MAKE) clean) ; done
+
+realclean: clean
+	rm -f $(EXECS) $(OMPEXECS) *.exe *.stackdump
+	for dir in $(SUBDIRS) ; do \
+	    if [ -s "$$dir/Makefile" ] ; then (cd $$dir && $(MAKE) realclean) ; \
+	fi ; done
+distclean: realclean
+	for dir in $(SUBDIRS) ; do \
+	    if [ -s "$$dir/Makefile" ] ; then (cd $$dir && $(MAKE) distclean) ; \
+	fi ; done
+	rm -f config.log config.status $(GENERATEDFILES) *.a
+	rm -rf autom4te.cache
+
+dist:
+	@if [ "X$(distdir)" == "X" ] ; then echo "Set distdir" ; exit 1 ; fi
+	@if [ ! -d $(distdir) ] ; then mkdir $(distdir) ; fi
+	cp $(SOURCES) $(distdir)
+	cp $(HEADER_FILES) $(distdir)
+	cp $(DIST_COMMON) $(distdir)
+	if [ "X$(DOC_FILES)" != "X" ] ; then cp $(DOC_FILES) $(distdir) ; fi
+
+hwlocupdate:
+	echo "Need to update hwloc.  Download and install."
+
+install:
+
+.PHONY: baseenvlib baseenvprogs clean realclean distclean dist hwlocupdate

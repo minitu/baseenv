@@ -1,0 +1,26 @@
+.TH topoSetMethods 3 "4/23/2018" " " ""
+.SH NAME
+topoSetMethods \-  Set the methods used to determine the topology 
+.SH SYNOPSIS
+.nf
+int topoSetMethods(topoMethod_t nodeMethod, topoMethod_t netMethod)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B nodeMethod 
+- The method used to determine the topology of the node (e.g.,
+the number of cores and sockets)
+.PD 1
+.PD 0
+.TP
+.B netMethod 
+- The method used to determine the topology connecting the
+nodes (e.g., a mesh for a Cray XE or IBM BlueGene).
+.PD 1
+
+.SH NOTES
+Valid methods can be discovered by calling 
+.I topoAvailMethods
+\&.
+

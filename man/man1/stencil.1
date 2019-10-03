@@ -1,0 +1,59 @@
+.TH stencil 1 "10/5/2018" " " ""
+.SH NAME
+stencil \-  Measure the performance of different halo-exchange approaches in MPI for a regular stencil code 
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B nrange 
+- Range of problem sizes.  See below
+.PD 1
+.PD 0
+.TP
+.B energy 
+- Amount of energy to input into the simulation
+.PD 1
+.PD 0
+.TP
+.B niters 
+- Number of iterations to perform
+.PD 1
+.PD 0
+.TP
+.B px 
+- Number of processes in the x-direction
+.PD 1
+.PD 0
+.TP
+.B py 
+- Number of processes in the y-direction
+.PD 1
+.PD 0
+.TP
+.B filename 
+- Name of output file (stdout if not provided)
+.PD 1
+
+.SH OUTPUT RESULTS
+The output is printed as a tab-separated table, indicating the
+time for the different operations and halo-exchange choices, as well as an
+achieved computation rate.  The default output is to stdout, but can be
+changed with a commandline argument.
+
+.SH NOTES
+The 
+.I nrange
+parameter provides the size of a size of the mesh, and may
+be either a single value, a comma-separated list, or a range in the form
+.I start:end:increment
+\&.
+
+
+The program should be compiled with optimization and with vectorization
+enabled if the computation rates are to be used.  Note that the computation
+code does not compute the heat per iteration unless the code is compiled
+with 
+.I -DCOMPUTE_HEAT_EACH_ITERATION=1
+\&.
+Including this code causes the
+Cray compiler (at least) to fail to vectorize the application of the stencil
+in the same loop, causing a significant loss in performance.

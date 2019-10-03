@@ -1,0 +1,32 @@
+.TH TextFileReadOpen 3 "1/3/2019" " " ""
+.SH NAME
+TextFileReadOpen \-  Open a file for reading and processing in parallel 
+.SH SYNOPSIS
+.nf
+int TextFileReadOpen(const char filename[], MPI_Comm comm, MPI_Info info,
+TextFile *fh_p)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B filename 
+- File to open
+.PD 1
+.PD 0
+.TP
+.B comm     
+- Communicator of processes that will open the file
+.PD 1
+.PD 0
+.TP
+.B info     
+- MPI_Info value passed to MPI_File_open
+.PD 1
+
+.SH OUTPUT PARAMTER
+.PD 0
+.TP
+.B fh_p     
+- TextFile handle to be used with other TextFile routines
+.PD 1
+

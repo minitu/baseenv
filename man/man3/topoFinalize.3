@@ -1,0 +1,19 @@
+.TH topoFinalize 3 "4/23/2018" " " ""
+.SH NAME
+topoFinalize \-  Finalize the topology package 
+.SH SYNOPSIS
+.nf
+int topoFinalize(topoinfo_t **topo)
+.fi
+.SH INPUT/OUTPUT PARAMETER
+.PD 0
+.TP
+.B topo 
+- Address of the pointer returned by 
+.I topoInit
+\&.
+Set to NULL on exit.
+.PD 1
+
+.SH RETURN VALUE
+0 on success, non-zero on failure.

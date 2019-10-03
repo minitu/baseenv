@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topoToArray</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topoToArray"><H1>topoToArray</H1></A>
+Convert a topoinfo structure into a array of coordinates 
+<H2>Synopsis</H2>
+<PRE>
+int topoToArray(topoinfo_t *topoinfo, int mycoords[], int maxcoords[],
+               int *nlevels, int *nodeidx, int maxdim)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>topo </B><DD>Pointer to topology information
+
+<DT><B>maxdim </B><DD>Maximum size of arrays <tt>mycoords</tt> and <tt>maxcoords
+</tt>
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL>
+<DT><B>mycoords </B><DD>a nonnegative integer giving a value for each <em>level</em> of the
+topology, starting from the smallest (typically a processor core)
+
+<DT><B>maxcoords </B><DD>The maximum value of the coordinate for this level
+
+<DT><B>nlevels </B><DD>The number of <em>levels</em> of the topology.
+
+<DT><B>nodeidx </B><DD>The index of the first level of the topology above that of
+a node.
+</DL>
+<P>
+<H2>Notes</H2>
+This routine provides a way to convert a topoinfo structure into an array of
+coordinates that can be used map calling processes onto the physical
+topology.  <tt>mycoords[i]</tt> contains a coordinate for the calling process at the
+ith level, with the finest level at i=0.  Levels between 0 and nodeidx-1 are
+within a single node.  Level <tt>nodeidx</tt> (if less than <tt>nlevels</tt>) is the first
+level of the interconnect between nodes.  If the interconnnect is a mesh,
+there will be a separate level for each dimension of the interconnect.
+</BODY></HTML>

@@ -1,0 +1,215 @@
+#! /bin/sh
+
+# Set the defaults
+buildexec=yes
+runexec=no
+mpiexec=mpiexec
+if [ -x mpiexec.pl ] ; then mpiexec="./mpiexec.pl -batch -ppn 1" ; fi
+
+cfamily=clang
+cacc_arch=
+chost_arch=
+cvector_arch=
+#
+for arg do
+    case $arg in
+    -pgi)
+        cfamily=pgi
+        cacc_arch=tesla
+	chost_arch=multicore
+	cvector_arch=
+    ;;
+    -cray)
+        cfamily=cray
+        cvector_arch=xe6
+	chost_arch=none
+	cacc_arch=
+    ;;
+    -gcc)
+        cfamily=gcc
+	# Note that there is no ACC option for the compiler
+	cacc_arch=none
+	chost_arch=none
+        cvector_arch=
+    ;;
+    -clang)
+        cfamily=clang
+	# Note that there is no ACC option for the compiler
+	cacc_arch=none
+	chost_arch=none
+        cvector_arch=
+    ;;
+    -run)
+        runexec=yes
+        buildexec=no
+    ;;
+    *)
+        echo "Unrecognized argument $arg"
+        exit 1
+    ;;
+    esac
+done
+
+if [ $buildexec = "yes" ] ; then
+   # Basic vectorization on host
+   make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cvector_arch gpuvec
+   make clean
+   make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cvector_arch \
+           PGMSUFFIX=-double \
+      	   EXTRAFLAGS=-DBASETYPE=double gpuvec-double
+   make clean
+   # Basic vectorization on host with long(er) vectors
+   make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cvector_arch \
+       EXTRAFLAGS=-DLEN=256000 PGMSUFFIX=-len256k gpuvec-len256k
+   make clean
+   make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cvector_arch \
+       PGMSUFFIX=-double-len256k \
+       EXTRAFLAGS="-DBASETYPE=double -DLEN=256000" gpuvec-double-len256k
+   make clean
+   make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cvector_arch \
+           PGMSUFFIX=-dyn \
+           EXTRAFLAGS=-DUSE_DYNAMIC_ALLOC gpuvec-dyn
+   make clean
+   make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cvector_arch \
+           PGMSUFFIX=-double-dyn \
+           EXTRAFLAGS="-DUSE_DYNAMIC_ALLOC -DBASETYPE=double" gpuvec-double-dyn
+   make clean
+
+   # Multicore (run on host)
+   if [ "$chost_arch" != "none" ] ; then
+       make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$chost_arch gpuvec-acc
+       make clean
+       make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$chost_arch PGMSUFFIX=-acc-double \
+      	   EXTRAFLAGS=-DBASETYPE=double gpuvec-acc-double
+       make clean
+   fi
+
+   # Accelerator
+   if [ "$cacc_arch" != "none" ] ; then
+       make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cacc_arch PGMSUFFIX=-gpu gpuvec-acc-gpu
+       make clean
+       make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cacc_arch PGMSUFFIX=-gpu-double \
+      	   EXTRAFLAGS=-DBASETYPE=double gpuvec-acc-gpu-double
+       make clean
+       make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cacc_arch \
+	   PGMSUFFIX=-gpu-kernel EXTRAFLAGS=-DACC_USE_KERNELS=1 \
+	   gpuvec-acc-gpu-kernel
+       make clean
+       make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cacc_arch \
+	   PGMSUFFIX=-gpu-kernel-double \
+      	   EXTRAFLAGS="-DACC_USE_KERNELS=1 -DBASETYPE=double" \
+	   gpuvec-acc-gpu-kernel-double
+       make clean
+   fi
+
+   if [ "$chost_arch" != "none" ] ; then
+       # Multicore (run on host) with long arrays
+       make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$chost_arch \
+      	   EXTRAFLAGS=-DLEN=256000 PGMSUFFIX=-len256k gpuvec-acc-len256k
+       make clean
+       make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$chost_arch \
+      	   PGMSUFFIX=-double-len256k \
+      	   EXTRAFLAGS="-DBASETYPE=double -DLEN=256000" gpuvec-acc-double-len256k
+       make clean
+   fi
+
+   # Accelerator with long arrays
+   if [ "$cacc_arch" != "none" ] ; then
+       make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cacc_arch \
+               PGMSUFFIX=-gpu-len256k \
+      	   EXTRAFLAGS=-DLEN=256000  gpuvec-acc-gpu-len256k
+       make clean
+       make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cacc_arch \
+      	   PGMSUFFIX=-gpu-double-len256k \
+      	   EXTRAFLAGS="-DBASETYPE=double -DLEN=256000" \
+	   gpuvec-acc-gpu-double-len256k
+       make clean
+       make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cacc_arch \
+           PGMSUFFIX=-gpu-kernel-len256k \
+      	   EXTRAFLAGS="-DLEN=256000 -DACC_USE_KERNELS=1" \
+	   gpuvec-acc-gpu-kernel-len256k
+       make clean
+       make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cacc_arch \
+      	   PGMSUFFIX=-gpu-kernel-double-len256k \
+      	   EXTRAFLAGS="-DBASETYPE=double -DLEN=256000 -DACC_USE_KERNELS=1" \
+	   gpuvec-acc-gpu-kernel-double-len256k
+       make clean
+   fi
+
+   # Add dynamic allocation
+   if [ "$cacc_arch" != "none" ] ; then
+       make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cacc_arch \
+           PGMSUFFIX=-gpu-dyn \
+      	   EXTRAFLAGS=-DUSE_DYNAMIC_ALLOC=1 gpuvec-acc-gpu-dyn
+       make clean
+   #     make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cacc_arch \
+   #    	   PGMSUFFIX=-gpu-double-dyn \
+   #    	   EXTRAFLAGS="-DBASETYPE=double -DUSE_DYNAMIC_ALLOC=1" \
+   # 	   gpuvec-acc-gpu-double-dyn
+   #     make clean
+   #     make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cacc_arch \
+   #         PGMSUFFIX=-gpu-kernel-dyn \
+   #    	   EXTRAFLAGS="-DUSE_DYNAMIC_ALLOC=1 -DACC_USE_KERNELS=1" \
+   # 	   gpuvec-acc-gpu-dyn
+   #     make clean
+   #     make COMPILER_FAMILY=$cfamily COMPILER_ARCH=$cacc_arch \
+   #    	   PGMSUFFIX=-gpu-kernel-double-dyn \
+   #    	   EXTRAFLAGS="-DBASETYPE=double -DUSE_DYNAMIC_ALLOC=1 -DACC_USE_KERNELS=1" \
+   # 	   gpuvec-acc-gpu-kernel-double-dyn
+   #     make clean
+   fi
+
+   # Add ACC kernel option test (only look at best case?)
+fi
+
+# Programs to run:
+#  On multicore
+#   Vectorization
+#     gpuvec
+#     gpuvec-double
+#   Acc/OpenMP
+#     gpuvec-acc
+#     gpuvec-acc-double
+#     gpuvec-acc-len256k
+#     gpuvec-acc-double-len256k
+# On GPU
+#   gpuvec-acc-gpu
+#   gpuvec-acc-gpu-double
+#   gpuvec-acc-gpu-len256k
+#   gpuvec-acc-gpu-double-len256k
+#   gpuvec-acc-gpu-dyn
+#   gpuvec-acc-gpu-double-dyn
+#   gpuvec-acc-gpu-kernel
+#   gpuvec-acc-gpu-kernel-double
+#   gpuvec-acc-gpu-kernel-len256k
+#   gpuvec-acc-gpu-kernel-double-len256k
+#   gpuvec-acc-gpu-kernel-dyn
+#   gpuvec-acc-gpu-kernel-double-dyn
+#
+# These run individual programs on Blue Waters nodes.
+# Replace "$mpiexec -n 1 -ppn 1" with "run on host" and
+
+if [ "$runexec" = "yes" ] ; then
+   if [ "$cvector_arch" != "none" ] ; then
+       $mpiexec -n 1 ./gpuvec -outfile gpuvec.txt
+       $mpiexec -n 1 ./gpuvec-double -outfile gpuvec-double.txt
+       $mpiexec -n 1 ./gpuvec-len256k -outfile gpuvec-len256k.txt
+       $mpiexec -n 1 ./gpuvec-double-len256k -outfile gpuvec-double-len256k.txt
+   fi
+   if [ "$chost_arch" != "none" ] ; then
+       $mpiexec -n 1 ./gpuvec-acc -outfile gpuvec-acc.txt
+       $mpiexec -n 1 ./gpuvec-acc-len256k -outfile gpuvec-acc-len256k.txt
+       $mpiexec -n 1 ./gpuvec-acc-double -outfile gpuvec-acc-double.txt
+       $mpiexec -n 1 ./gpuvec-acc-double-len256k -outfile gpuvec-acc-double-len256k.txt
+   fi
+   if [ "$cacc_arch" != "none" ] ; then
+       $mpiexec -n 1 --xk ./gpuvec-acc-gpu -outfile gpuvec-acc-gpu.txt
+       $mpiexec -n 1 --xk ./gpuvec-acc-gpu-len256k -outfile gpuvec-acc-gpu-len256k.txt
+       $mpiexec -n 1 --xk ./gpuvec-acc-gpu-double -outfile gpuvec-acc-gpu-double.txt
+       $mpiexec -n 1 --xk ./gpuvec-acc-gpu-double-len256k -outfile gpuvec-acc-gpu-double-len256k.txt
+       $mpiexec -n 1 --xk ./gpuvec-acc-gpu-kernel -outfile gpuvec-acc-gpu-kernel.txt
+       $mpiexec -n 1 --xk ./gpuvec-acc-gpu-kernel-len256k -outfile gpuvec-acc-gpu-kernel-len256k.txt
+       $mpiexec -n 1 --xk ./gpuvec-acc-gpu-kernel-double -outfile gpuvec-acc-gpu-kernel-double.txt
+       $mpiexec -n 1 --xk ./gpuvec-acc-gpu-kernel-double-len256k -outfile gpuvec-acc-gpu-kernel-double-len256k.txt
+   fi
+fi

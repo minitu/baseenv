@@ -1,0 +1,66 @@
+.TH topoToArray 3 "4/23/2018" " " ""
+.SH NAME
+topoToArray \-  Convert a topoinfo structure into a array of coordinates 
+.SH SYNOPSIS
+.nf
+int topoToArray(topoinfo_t *topoinfo, int mycoords[], int maxcoords[],
+int *nlevels, int *nodeidx, int maxdim)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B topo 
+- Pointer to topology information
+.PD 1
+.PD 0
+.TP
+.B maxdim 
+- Maximum size of arrays 
+.I mycoords
+and 
+.I maxcoords
+
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B mycoords 
+- a nonnegative integer giving a value for each 
+.B level
+of the
+topology, starting from the smallest (typically a processor core)
+.PD 1
+.PD 0
+.TP
+.B maxcoords 
+- The maximum value of the coordinate for this level
+.PD 1
+.PD 0
+.TP
+.B nlevels 
+- The number of 
+.B levels
+of the topology.
+.PD 1
+.PD 0
+.TP
+.B nodeidx 
+- The index of the first level of the topology above that of
+a node.
+.PD 1
+
+.SH NOTES
+This routine provides a way to convert a topoinfo structure into an array of
+coordinates that can be used map calling processes onto the physical
+topology.  
+.I mycoords[i]
+contains a coordinate for the calling process at the
+ith level, with the finest level at i=0.  Levels between 0 and nodeidx-1 are
+within a single node.  Level 
+.I nodeidx
+(if less than 
+.I nlevels
+) is the first
+level of the interconnect between nodes.  If the interconnnect is a mesh,
+there will be a separate level for each dimension of the interconnect.

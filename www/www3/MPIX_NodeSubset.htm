@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPIX_NodeSubset</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPIX_NodeSubset"><H1>MPIX_NodeSubset</H1></A>
+Create a subset of a given communicator with a specified number of nodes 
+<H2>Synopsis</H2>
+<PRE>
+int MPIX_NodeSubset(MPI_Comm incomm, MPI_Comm leadercomm, MPI_Comm nodecomm,
+                   int nnodes, MPI_Comm *outcommPtr)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>incomm </B><DD>Communicator from which to form the subset
+
+<DT><B>leadercomm </B><DD>Communicator of node leaders for <tt>incomm
+</tt>
+<DT><B>nodecomm </B><DD>Communicator of processes on this node
+
+<DT><B>nnodes </B><DD>Number of nodes to retain in the subset
+</DL>
+<P>
+<H2>Output Parameter</H2>
+<DL><DT><B>outcommPtr </B> <DD> Pointer to the created subset communicator.
+</DL>
+<P>
+<H2>Notes</H2>
+Given an incomm, with leadercomm of the nodes and nodecomm for the
+processes on the same node as the calling process, create a subset
+communicator with nnodes nodes.
+<P>
+</BODY></HTML>

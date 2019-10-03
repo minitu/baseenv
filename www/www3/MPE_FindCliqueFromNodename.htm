@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPE_FindCliqueFromNodename</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPE_FindCliqueFromNodename"><H1>MPE_FindCliqueFromNodename</H1></A>
+Find cliques from the node name within a communicator 
+<H2>Synopsis</H2>
+<PRE>
+int MPE_FindCliqueFromNodename( MPI_Comm comm, int hintSize, int maxSize, 
+                             int *cliqueNum, int *cliqueSize,
+                             int cliqueRanks[] )
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>comm </B><DD>Communicator of processes
+
+<DT><B>hintSize </B><DD>?
+
+<DT><B>maxSize </B><DD>Maximum number of ranks in cliqueRanks
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL>
+<DT><B>cliqueNum </B><DD>Id of this clique, starting from zero
+
+<DT><B>cliqueSize </B><DD>Number of processes in this clique
+
+<DT><B>cliqueRanks </B><DD>Ranks of processes in this clique
+</DL>
+<P>
+</BODY></HTML>

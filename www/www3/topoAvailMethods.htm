@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topoAvailMethods</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topoAvailMethods"><H1>topoAvailMethods</H1></A>
+Return the available methods for determining the topology 
+<H2>Synopsis</H2>
+<PRE>
+int topoAvailMethods(int maxnum, int *nnode, int *nnet,
+                    topoMethod_t nodeMethod[], topoMethod_t netMethod[])
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>maxnum </B> <DD> Size of the arrays <tt>nodeMethod</tt> and <tt>netMethod
+</tt>
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL>
+<DT><B>nnode </B><DD>Number of node methods defined
+
+<DT><B>nnet </B><DD>Number of network methods defined
+
+<DT><B>nodeMethod </B><DD>Array containing an entry for each node method
+
+<DT><B>netMethod </B><DD>Array containing an entry for each network method
+</DL>
+<P>
+<H2>Notes</H2>
+This routine returns the available methods to determine the topology
+information within the node and between nodes (the internode network).
+Values are taken from the enum <tt>topoMethod_t</tt>.  The methods may be used
+in <tt>topoSetMethods</tt> to specify how the topology is determined when <tt>topoInit
+</tt>is called.
+<P>
+</BODY></HTML>

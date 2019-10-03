@@ -1,0 +1,11 @@
+.TH MPUTIL_BEGIN 3 "1/3/2019" " " ""
+.SH NAME
+MPUTIL_BEGIN \-  Begin a block of code to be timed 
+.SH NOTES
+In the parallel case, the block is executed for a number of processes
+ranging from 1 to the size of 
+.I MPI_COMM_WORLD
+\&.
+The block is terminated
+by 
+.I MPUTIL_END

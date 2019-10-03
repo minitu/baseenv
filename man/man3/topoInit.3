@@ -1,0 +1,110 @@
+.TH topoInit 3 "4/23/2018" " " ""
+.SH NAME
+topoInit \-  Initialize the hardware topology package 
+.SH SYNOPSIS
+.nf
+int topoInit(int isVerbose, topoinfo_t **topo_p)
+.fi
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B isVerbose 
+- If true, provide verbose output to stdout about the operation
+of the routines.
+.PD 1
+
+.SH OUTPUT PARAMETER
+.PD 0
+.TP
+.B topo_p 
+- On successful exit, points to a 
+.I topoinfo_t
+structure.  This
+lists the topology of the system in which the calling process is executing
+starting from processor cores and working out.  See notes below.
+.PD 1
+
+.SH COLLECTIVE
+This routine is collective over all processes in the job.  It is not
+necessarily synchronizing, but some systems may require collective
+operations in order to return the requested data.
+
+.SH RETURN VALUE
+0 on success, non-zero on failure.
+
+.SH ENVIRONMENT VARIABLES
+.PD 0
+.TP
+.B TOPO_CORESPERCHIP 
+- If set to an integer value (as a string), then every
+socket (processor chip) is considered to have this many cores.
+.PD 1
+.PD 0
+.TP
+.B TOPO_CHIPSPERNODE 
+- If set to an integer value (as a string), then every
+node is considered to have this many chips (sockets).
+.PD 1
+
+.SH NOTES
+The topo package is designed for massively parallel systems with regular
+networks, such as a torus or mesh.  If the hwloc package is available,
+this package can use hwloc to provide some information about the node
+topology.  The 
+.I topoinfo_t
+structure provides a list of entries, starting
+with the finest grain (typically a core, but could be a chip or node if
+more detailed information is not available).
+
+.SH SYSTEMS SUPPORTED
+
+Note - only IBM, Cray, and HWLOC currently implemented.
+
+.PD 0
+.TP
+.B IBM Blue Gene/Q 
+- Provides interconnect mesh coordinates
+.PD 1
+.PD 0
+.TP
+.B Cray XE6 and XK7 
+- Provides interconnent mesh coordinates and core number;
+with 
+.I TOPO_CORESPERCHIP
+correctly set, also provides socket number
+.PD 1
+.PD 0
+.TP
+.B Miscellaneous MPI programs that have 
+.I MPI_Comm_split_type
+\&.
+This
+- routine may be used to determine a topology based on processes that can
+share memory.  This is represented as a 
+.I TOPO_NODE
+\&.
+
+.PD 1
+.PD 0
+.TP
+.B Miscellaneous Unix systems 
+- With hwloc, provides node information.
+if 
+.I sched_getcpu
+is available, this is used to find the core number
+(use the environment variable 
+.I TOPO_CORESPERCHIP
+to identify to which
+chip in a multi-chip node a core belongs).
+Without hwloc, the code uses the hostname to identify processes that
+share the same hostname, and identifies these as belonging to the same
+.I TOPO_NODE
+\&.
+
+.PD 1
+
+.SH THREAD SAFETY
+If called by multiple threads, they must provide the same value for
+.I isVerbose
+\&.
+

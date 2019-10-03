@@ -1,0 +1,86 @@
+.TH MPIX_Nodecart_coords 3 "1/3/2019" " " ""
+.SH NAME
+MPIX_Nodecart_coords \-  Determines process coords in Cartesian topology given rank in group 
+.SH SYNOPSIS
+.nf
+int MPIX_Nodecart_coords(MPI_Comm comm, int rank, int maxdims, int coords[])
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B comm 
+- communicator with Cartesian structure (handle)
+.PD 1
+.PD 0
+.TP
+.B rank 
+- rank of a process within group of 
+.I comm
+(integer)
+.PD 1
+.PD 0
+.TP
+.B maxdims 
+- length of vector 
+.I coords
+in the calling program (integer)
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B coords 
+- integer array (of size 
+.I ndims
+) containing the Cartesian
+coordinates of specified process (integer)
+.PD 1
+*/
+int MPIX_Nodecart_coords(MPI_Comm comm, int rank, int maxdims, int coords[])
+{
+int        flag;
+nodecart_t *ninfo;
+
+MPI_Comm_get_attr(comm, nodecartKeyval, &ninfo, &flag);
+if (!ninfo || !flag) {
+fprintf(stderr, "Unable to access attribute on comm\\n");
+fflush(stderr);
+MPI_Abort(MPI_COMM_WORLD, 1 );
+}
+
+rankToCoords(ninfo->ndim, ninfo->dims, rank, coords);
+
+return MPI_SUCCESS;
+}
+
+/*@
+MPIX_Nodecart_rank - Determines process rank in communicator given Cartesian
+location
+
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B comm 
+- communicator with Cartesian structure (handle)
+.PD 1
+.PD 0
+.TP
+.B coords 
+- integer array (of size 
+.I ndims
+, the number of dimensions of
+the Cartesian topology associated with 
+.I comm
+) specifying the Cartesian
+coordinates of a process
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B rank 
+- rank of specified process (integer)
+.PD 1
+
+.SH NOTES
+Out-of-range coordinates are erroneous for non-periodic dimensions.

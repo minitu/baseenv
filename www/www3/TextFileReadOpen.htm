@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>TextFileReadOpen</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="TextFileReadOpen"><H1>TextFileReadOpen</H1></A>
+Open a file for reading and processing in parallel 
+<H2>Synopsis</H2>
+<PRE>
+int TextFileReadOpen(const char filename[], MPI_Comm comm, MPI_Info info,
+                    TextFile *fh_p)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>filename </B><DD>File to open
+
+<DT><B>comm     </B><DD>Communicator of processes that will open the file
+
+<DT><B>info     </B><DD>MPI_Info value passed to MPI_File_open
+</DL>
+<P>
+<H2>Output Paramter</H2>
+<DL><DT><B>fh_p     </B> <DD> TextFile handle to be used with other TextFile routines
+</DL>
+<P>
+</BODY></HTML>

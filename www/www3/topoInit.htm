@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topoInit</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topoInit"><H1>topoInit</H1></A>
+Initialize the hardware topology package 
+<H2>Synopsis</H2>
+<PRE>
+int topoInit(int isVerbose, topoinfo_t **topo_p)
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>isVerbose </B> <DD> If true, provide verbose output to stdout about the operation
+of the routines.
+</DL>
+<P>
+<H2>Output Parameter</H2>
+<DL><DT><B>topo_p </B> <DD> On successful exit, points to a <tt>topoinfo_t</tt> structure.  This
+lists the topology of the system in which the calling process is executing
+starting from processor cores and working out.  See notes below.
+</DL>
+<P>
+<H2>Collective</H2>
+This routine is collective over all processes in the job.  It is not
+necessarily synchronizing, but some systems may require collective
+operations in order to return the requested data.
+<P>
+<H2>Return value</H2>
+0 on success, non-zero on failure.
+<P>
+<H2>Environment Variables</H2>
+<DL>
+<DT><B>TOPO_CORESPERCHIP </B><DD>If set to an integer value (as a string), then every
+socket (processor chip) is considered to have this many cores.
+
+<DT><B>TOPO_CHIPSPERNODE </B><DD>If set to an integer value (as a string), then every
+node is considered to have this many chips (sockets).
+</DL>
+<P>
+<H2>Notes</H2>
+The topo package is designed for massively parallel systems with regular
+networks, such as a torus or mesh.  If the hwloc package is available,
+this package can use hwloc to provide some information about the node
+topology.  The <tt>topoinfo_t</tt> structure provides a list of entries, starting
+with the finest grain (typically a core, but could be a chip or node if
+more detailed information is not available).
+<P>
+<H2>Systems Supported</H2>
+<P>
+Note - only IBM, Cray, and HWLOC currently implemented.
+<P>
+<DL>
+<DT><B>IBM Blue Gene/Q </B><DD>Provides interconnect mesh coordinates
+
+<DT><B>Cray XE6 and XK7 </B><DD>Provides interconnent mesh coordinates and core number;
+with <tt>TOPO_CORESPERCHIP</tt> correctly set, also provides socket number
+
+<DT><B>Miscellaneous MPI programs that have <tt>MPI_Comm_split_type</tt>.  This</B><DD>routine may be used to determine a topology based on processes that can
+share memory.  This is represented as a <tt>TOPO_NODE</tt>.
+
+<DT><B>Miscellaneous Unix systems </B><DD>With hwloc, provides node information.
+if <tt>sched_getcpu</tt> is available, this is used to find the core number
+(use the environment variable <tt>TOPO_CORESPERCHIP</tt> to identify to which
+chip in a multi-chip node a core belongs).
+Without hwloc, the code uses the hostname to identify processes that
+share the same hostname, and identifies these as belonging to the same
+<tt>TOPO_NODE</tt>.
+</DL>
+<P>
+<H2>Thread safety</H2>
+If called by multiple threads, they must provide the same value for
+<tt>isVerbose</tt>.
+</BODY></HTML>

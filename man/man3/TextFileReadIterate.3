@@ -1,0 +1,26 @@
+.TH TextFileReadIterate 3 "1/3/2019" " " ""
+.SH NAME
+TextFileReadIterate \-  Process all lines in a file 
+.SH SYNOPSIS
+.nf
+int TextFileReadIterate(TextFile fh,
+int (*processline)(const char *, int len, void *),
+void *extra_data)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B fh 
+- TextFile handle
+.PD 1
+.PD 0
+.TP
+.B processline 
+- Routine to process an input line
+.PD 1
+.PD 0
+.TP
+.B extra_data 
+- Pointer to extra data for processline
+.PD 1
+

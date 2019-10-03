@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topoMeshContainer</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topoMeshContainer"><H1>topoMeshContainer</H1></A>
+If the topology contains a mesh or torus, return the minimum and maximum dimensions of the n-d section that contains all processes 
+<H2>Synopsis</H2>
+<PRE>
+int topoMeshContainer(topoinfo_t *topo, int *ndim,
+                     int mindim[], int maxdim[], int qtorus[])
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>topo </B> <DD> Pointer to topology information
+</DL>
+<P>
+<H2>Input/Output Parameter</H2>
+<DL><DT><B>ndim </B> <DD> Pointer to dimension of mesh or torus.  On input, the size of the
+arrays <tt>mindim</tt>, <tt>maxdim</tt>, and <tt>qtorus</tt>.  On output, the size of the
+mesh or torus.
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL>
+<DT><B>mindim </B><DD>The minimum coordinates of any process in the mesh or torus.
+
+<DT><B>maxdim </B><DD>The maximum coordinates of any process in the mesh or torus.
+
+<DT><B>qtorus </B><DD>1 if this dimension is periodic, 0 otherwise.
+</DL>
+<P>
+<H2>Return Value</H2>
+0 on success (a mesh topology element was found and the data returned).
+Nonzero (currently <tt>1</tt>) on failure, and <tt>-1</tt> if the topology does not
+contain a mesh or torus.
+<P>
+<H2>Notes</H2>
+The current implementation does not indicate whether any particular dimension
+is periodic, only whether the entire multidimensional mesh is periodic.
+In addition, a subset of a torus is still returned as a torus even though the
+min and max coordinates in this dimension are not connected directly together.
+</BODY></HTML>

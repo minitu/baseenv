@@ -1,0 +1,1 @@
+#define BASEENV_GITHASH "d20cedfb7e7bbf77af371cdcb829fc7ee26b267f"

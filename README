@@ -1,0 +1,43 @@
+A basic development environment for parallel computing.
+More specifically, the things that I want to work with when exploring a system.
+
+See NOTES for more details about the package
+
+See INSTALL for information about building, installing, and using this package
+
+Performance tests
+-----------------
+There are many performance tests and options.  The following will give a good
+overview of the system
+
+nodeperf:
+    Run with 1 process on 1 node
+    -n 1 ./spmv-c  100 >spmv-100-c.out 2>spmv-100-c.err
+    -n 1 ./spmv-f  100 >spmv-100-f.out 2>spmv-100-f.err
+    -n 1 ./spmv-c  1000 >spmv-1000-c.out 2>spmv-1000-c.err
+    -n 1 ./spmv-f  1000 >spmv-1000-f.out 2>spmv-1000-f.err
+    -n 1 ./stream-c  >stream-c.out 2>stream-c.err
+    -n 1 ./stream-f  >stream-f.out 2>stream-f.err
+    -n 1 ./fma-c 1000 >fma-1000-c.out 2>fma-1000-c.err
+    -n 1 ./fma-c 1000000 >fma-1e6-c.out 2>fma-1e6-c.err
+
+haloperf:
+    Run with 1 MPI per core
+    -n 1024 halocompare -nbrs 2 >halocompare-2.out 2>halocompare-2.err
+    -n 1024 halocompare -nbrs 4 >halocompare-4.out 2>halocompare-4.err
+    -n 1024 halocompare -nbrs 8 >halocompare-8.out 2>halocompare-8.err
+    -n 1024 nodecomm >nodecomm.out 2>nodecomm.err
+
+perftest:
+     Run on all cores on one node:
+     -n 16 ./mstream  >mstream.out 2>mstream.err
+     -n 16 ./blksweep  >blksweep.out 2>blksweep.err
+
+     Run on all chips on one node (forcing 2 processes onto the different chips)
+     -n 2 ./mpptest -logscale >mpptest-interc.out 2>mpptest-interc.err
+
+     Run between cores on the same chip
+     -n 2 ./mpptest -logscale >mpptest-intrac.out 2>mpptest-intrac.err
+
+     Run between nodes
+     -n 2 ./mpptest -logscale >mpptest.out 2>mpptest.err

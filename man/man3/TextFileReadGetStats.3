@@ -1,0 +1,38 @@
+.TH TextFileReadGetStats 3 "1/3/2019" " " ""
+.SH NAME
+TextFileReadGetStats \-  Return performance statistics about a TextFile 
+.SH SYNOPSIS
+.nf
+int TextFileReadGetStats(TextFile fh, int tsize, double t[],
+MPI_Offset *bytesRead)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B fh 
+- TextFile
+.PD 1
+.PD 0
+.TP
+.B tsize 
+- Size of array 
+.I t
+
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B t 
+- Time values for different operations
+.PD 1
+.PD 0
+.TP
+.B bytesRead 
+- Number of bytes read by this process
+.PD 1
+
+.SH NOTES
+This is not a collective routine - each process can read its own data
+independently.
+

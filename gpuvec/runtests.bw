@@ -1,0 +1,65 @@
+#! /bin/bash
+#PBS -q normal
+#PBS -A fyy
+#PBS -N gpuvec-runtests
+
+#### User gropp
+# Always request the entire node.  ppn is now the processors per node,
+# which is 32 for xe and 16 (?) for xk
+#PBS -l nodes=1:ppn=16:xk
+#PBS -l walltime=0:05:00
+
+#
+cd $PBS_O_WORKDIR
+#
+#aprun -n 1 -N 1 -cc 0 ./gpuvec-acc  < /dev/null >${EXENAME}-out 2>${EXENAME}-err
+
+RUNEXE="aprun -n 1 -N 1 -cc 0"
+
+# You can set any of these to "none" to turn off that set of tests.
+cvector_arch=pgi
+chost_arch=xe6
+#chost_arch=none
+cacc_arch=
+#srun gpuvec-acc -outfile g-acc.txt
+
+set -x
+if [ "$cvector_arch" != "none" ] ; then
+    date
+    ${RUNEXE} ./gpuvec -outfile gpuvec.txt
+    date
+    ${RUNEXE} ./gpuvec-double -outfile gpuvec-double.txt
+    date
+    ${RUNEXE} ./gpuvec-len256k -outfile gpuvec-len256k.txt
+    date
+    ${RUNEXE} ./gpuvec-double-len256k -outfile gpuvec-double-len256k.txt
+fi
+if [ "$chost_arch" != "none" ] ; then
+    date
+    ${RUNEXE} ./gpuvec-acc -outfile gpuvec-acc.txt
+    date
+    ${RUNEXE} ./gpuvec-acc-len256k -outfile gpuvec-acc-len256k.txt
+    date
+    ${RUNEXE} ./gpuvec-acc-double -outfile gpuvec-acc-double.txt
+    date
+    ${RUNEXE} ./gpuvec-acc-double-len256k -outfile gpuvec-acc-double-len256k.txt
+fi
+if [ "$cacc_arch" != "none" ] ; then
+    date
+    ${RUNEXE} ./gpuvec-acc-gpu -outfile gpuvec-acc-gpu.txt
+    date
+    ${RUNEXE} ./gpuvec-acc-gpu-len256k -outfile gpuvec-acc-gpu-len256k.txt
+    date
+    ${RUNEXE} ./gpuvec-acc-gpu-double -outfile gpuvec-acc-gpu-double.txt
+    date
+    ${RUNEXE} ./gpuvec-acc-gpu-double-len256k -outfile gpuvec-acc-gpu-double-len256k.txt
+    date
+    ${RUNEXE} ./gpuvec-acc-gpu-kernel -outfile gpuvec-acc-gpu-kernel.txt
+    date
+    ${RUNEXE} ./gpuvec-acc-gpu-kernel-len256k -outfile gpuvec-acc-gpu-kernel-len256k.txt
+    date
+    ${RUNEXE} ./gpuvec-acc-gpu-kernel-double -outfile gpuvec-acc-gpu-kernel-double.txt
+    date
+    ${RUNEXE} ./gpuvec-acc-gpu-kernel-double-len256k -outfile gpuvec-acc-gpu-kernel-double-len256k.txt
+fi
+

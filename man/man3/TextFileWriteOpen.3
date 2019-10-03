@@ -1,0 +1,65 @@
+.TH TextFileWriteOpen 3 "4/23/2018" " " ""
+.SH NAME
+TextFileWriteOpen \-  Open a file for writing text output from a parallel program 
+.SH SYNOPSIS
+.nf
+int TextFileWriteOpen(MPI_Comm comm, int root, const char *fname, MPI_Info info,
+TextFile *fh_p)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B comm 
+- MPI Communicator of all processes that will perform text writes
+.PD 1
+.PD 0
+.TP
+.B root 
+- Rank of process (in 
+.I comm
+) that will perform I/O to the file
+.PD 1
+.PD 0
+.TP
+.B fname 
+- Name of the file to open.
+.PD 1
+.PD 0
+.TP
+.B info 
+- MPI Info object that may be used for opening the file.  Use
+.I MPI_INFO_NULL
+for no special behavior.
+.PD 1
+
+.SH OUTPUT PARAMETER
+.PD 0
+.TP
+.B fh_p 
+- Pointer to a 
+.I TextFile
+
+.PD 1
+
+.SH NOTES
+The 
+.I TextFileWriteXxx
+routines provide a way to ensure that multiple
+parallel processes correctly write output in a rank-ordered way.  Using
+output from individual processes, even if they are synchronized (e.g.,
+with 
+.I MPI_Barrier
+or the 
+.I seqBegin
+and 
+.I seqEnd
+routines), does not
+guarantee ordered output because the aggregation of data sent by I/O routines
+on each process to a file server does not guarantee any ordering.
+
+.SH RETURN VALUE
+An error code.  Currently, 
+.I MPI_SUCCESS
+is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.

@@ -1,0 +1,83 @@
+.TH MPUTIL_INIT 3 "1/3/2019" " " ""
+.SH NAME
+MPUTIL_INIT \-  Initialize the MPUTIL timing environment 
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B thread_level 
+- Indicate the desired level of threadedness.  See below.
+.PD 1
+
+.SH NOTES
+When benchmarking codes on SMP nodes, it is common to run the benchmark
+on a single core. However, in many applications, this is not the configuration
+that is important for the application.  It is common for the application to
+be running the same (or similar) code on all cores at the same time.
+The 
+.I MPUTIL_XXX
+macros provide a relatively easy way to run the same,
+single-core benchmark on 1, 2, 3, ..., k cores for a node with k total cores.
+Additional macros makes it easy to generate simple tables where there is
+a separate column for each number of active cores for the benchmark.
+See 
+.I MPUTIL_LABEL
+and 
+.I MPUTIL_OUTAPP
+for output.
+
+A typical program that uses these macros will have the following structure:
+.nf
+\&.
+\&.
+\&.
+MPUTIL_INIT(0);
+\&.
+\&.
+\&.
+any code that is executed only once, independent of the number of cores
+MPUTIL_BEGIN;
+\&.
+\&.
+\&.
+any code that each active core must execute, such as initialization
+MPUTIL_LABEL("label text for row, in printf format");
+MPUTIL_SYNC;
+\&.
+\&.
+\&.
+benchmark code, including timer calls.  Total time in tval
+MPUTIL_OUTAPP("\\t%.2e\\n",tval);
+MPUTIL_END;
+MPUTIL_FINALIZE;
+.fi
+
+
+The 
+.I thread_level
+is used only when creating the parallel version, which
+uses MPI processes to execute the benchmark in parallel.  To simplify the
+interface, this does not use the MPI-defined levels (thus, the benchmark
+never need inlude mpi.h).  The valid values are 
+.I 0
+for no threads used
+(
+.I MPI_THREAD_SINGLE
+), 
+.I 1
+for threads used in loops (
+.I MPI_THREAD_FUNNELED
+),
+and 
+.I 2
+for benchmarks that need 
+.I MPI_THREAD_MULTIPLE
+\&.
+Most regular
+benchmarks will use 
+.I 0
+, but OpenMP benchmarks will need to set
+.I thread_level
+to 
+.I 1
+\&.
+

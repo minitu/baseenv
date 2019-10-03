@@ -1,0 +1,15 @@
+Notes on this group of packages.
+
+This package provides a basic environment for parallel programming in an
+MPI environment.  The intent is to have relatively small, separable packages,
+but setup to permit a combined build and a single library containing all
+selected components.  To make this work, all of the component packages
+must follow the same rules for configure options, and for error reporting
+and naming.  These rules are detailed here.
+
+Error Reporting
+No error is 0.
+Unspecified error is -1
+Error in errno is -2
+Positive values are specific errors, and the package should provide a
+routine to convert these values into a string.

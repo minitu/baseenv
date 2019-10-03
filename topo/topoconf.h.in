@@ -1,0 +1,88 @@
+/* topoconf.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Define if BG/Q mpix routines are available */
+#undef HAVE_BGQ_MPIX
+
+/* Define if the Cray RCA library is available */
+#undef HAVE_CRAY_RCA
+
+/* Define to 1 if you have the `getcpu' function. */
+#undef HAVE_GETCPU
+
+/* Define to 1 if you have the <hwloc.h> header file. */
+#undef HAVE_HWLOC_H
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define if MPIX_Init_hw is now named MPIX_Hardware */
+#undef HAVE_MPIX_HARDWARE
+
+/* Define to 1 if you have the `MPI_Comm_split_type' function. */
+#undef HAVE_MPI_COMM_SPLIT_TYPE
+
+/* Set if MPI and nodename used to discover nodes */
+#undef HAVE_MPI_WITH_NODENAME
+
+/* Define to 1 if you have the `numa_get_run_node_mask' function. */
+#undef HAVE_NUMA_GET_RUN_NODE_MASK
+
+/* Define to 1 if you have the `numa_node_of_cpu' function. */
+#undef HAVE_NUMA_NODE_OF_CPU
+
+/* Define to 1 if you have the `numa_node_to_cpus' function. */
+#undef HAVE_NUMA_NODE_TO_CPUS
+
+/* Define to 1 if you have the `sched_getaffinity' function. */
+#undef HAVE_SCHED_GETAFFINITY
+
+/* Define to 1 if you have the `sched_getcpu' function. */
+#undef HAVE_SCHED_GETCPU
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the <utmpx.h> header file. */
+#undef HAVE_UTMPX_H
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS

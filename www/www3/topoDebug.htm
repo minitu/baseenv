@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topoDebug</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topoDebug"><H1>topoDebug</H1></A>
+Select a virtual topology to return 
+<H2>Synopsis</H2>
+<PRE>
+int topoDebug(int kind)
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>kind </B> <DD> Kind of topology to return.
+</DL>
+<P>
+<H2>Return value</H2>
+0 on success, non-zero on failure.
+<P>
+<H2>Notes</H2>
+Normally, the topo routines return information about the real topology
+of the underlying hardware.  However, this can make debugging programs
+that want to make use of these routines difficult, since the tests would
+have to be run on the target hardware system.  This routine allows the
+use of dummy, virtual topologies.  Valid values for <tt>kind</tt> include:
+<PRE>
+    kind = 1: Use a multiple of 8 processes, provide a Cray XE6-like
+              topology
+</PRE>
+
+</BODY></HTML>

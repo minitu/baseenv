@@ -1,0 +1,27 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>TextFileWriteFlush</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="TextFileWriteFlush"><H1>TextFileWriteFlush</H1></A>
+Flush all pending output to a TextFile 
+<H2>Synopsis</H2>
+<PRE>
+int TextFileWriteFlush(TextFile fh)
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>fh </B> <DD> TextFile handle
+</DL>
+<P>
+<H2>Notes</H2>
+This is a collective routine that must be called by every process in the
+communicator that was used to open the <tt>TextFile</tt> handle <tt>fh</tt>.
+<P>
+<H2>Return value</H2>
+An error code.  Currently, <tt>MPI_SUCCESS</tt> is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.
+<P>
+</BODY></HTML>

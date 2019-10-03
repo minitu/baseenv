@@ -1,0 +1,54 @@
+.TH topoNodeEnumeration 3 "4/23/2018" " " ""
+.SH NAME
+topoNodeEnumeration \-  Return a numbering of the nodes and the ranks of the processes on the same node 
+.SH SYNOPSIS
+.nf
+int topoNodeEnumeration(topoinfo_t *topo, int *numnodes, int *mynodenum,
+int *nranks, int noderanks[])
+.fi
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B topo 
+- Pointer to topoinfo that was returned by topoInit.
+.PD 1
+
+.SH INPUT/OUTPUT PARAMETER
+.PD 0
+.TP
+.B nranks 
+- On input, the size of 
+.I noderanks
+\&.
+On output, the number of
+processes on this node (including the calling process)
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B numnodes 
+- Number of nodes available
+.PD 1
+.PD 0
+.TP
+.B mynodenum 
+- Number of the node on which this process is running
+.PD 1
+.PD 0
+.TP
+.B noderanks 
+- Ranks, in MPI_COMM_WORLD, of processes on the same node as the
+calling process.  In the value of 
+.I *nranks
+on input is less than the
+total number of ranks, only the first 
+.I *nranks
+values are returned, and
+.I *nranks
+is set to the total number of ranks.
+.PD 1
+
+.SH RETURN VALUE
+
+.SH NOTES

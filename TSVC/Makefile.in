@@ -1,0 +1,158 @@
+ALL: all
+
+# Set the basic directories
+prefix           = @prefix@
+exec_prefix      = @exec_prefix@
+datarootdir      = @datarootdir@
+libdir           = @libdir@
+abs_builddir     = @abs_builddir@
+abs_top_builddir = @abs_top_builddir@
+builddir         = @builddir@
+top_builddir     = @top_builddir@
+abs_srcdir       = @abs_srcdir@
+abs_top_srcdir   = @abs_top_srcdir@
+
+master_top_builddir = @master_top_builddir@
+master_top_srcdir   = @master_top_srcdir@
+
+INCLUDELOC=@BASEENVMAIN@
+
+CC      = @CC@
+CFLAGS  = @CFLAGS@
+LIBS    = @LIBS@
+MKDIR_P = @MKDIR_P@
+DOCTEXT = @DOCTEXT@
+
+
+# If building alone, Makefile.doc and Makefile.vec are in this
+# directory.  If not, they are in the parent "baseenv" directory.
+include $(INCLUDELOC)/Makefile.doc
+# Include the vector options.  This is in the baseenv directory if
+# TSVC is part of baseenv, and in this directory if this package has
+# been distributed as a stand-alone package
+include $(INCLUDELOC)/Makefile.vec
+
+# The following code handles compiler bugs that we work around by using
+# some definitions.
+
+# Note that clang pretends to be gcc, but it isn't
+# clang version 9 has a bogus failure when inlining function f
+ifeq "$(COMPILER_FAMILY)" "clang"
+# CLANG
+EXTRAFLAGS=-DNO_INLINE_FOR_F
+endif
+
+ifeq "$(COMPILER_FAMILY)" "intel"
+# icc
+# workaround a bug in compiling one of the inline functions
+EXTRAFLAGS=-DNO_INLINE_FOR_F
+endif
+
+ifeq "$(COMPILER_FAMILY)" "pgi"
+# portland group
+# As of version 14.2-0, pgcc fails on routine s443.
+# Note -Minfo sends output to stderr, not to the lst file.
+# PGI also does not document any predefined macro identifying the compiler
+# Some third-party documentation suggests that __PGI is defined, but
+# since the PGI documentation doesn't disclose that, we can't count on it.
+# Thus we define our own macro to indicate PGI.
+EXTRAFLAGS = -DSKIP_S443 -DPGI_COMPILER
+endif
+
+# End of compiler-family information
+# ------------------------------------------------------------------------
+
+EXECS = runnovec runvec
+all : runvec runnovec
+
+runnovec : tscnovec.o dummy.o
+	$(CC) $(NOOPTFLAGS) dummy.o tscnovec.o -o runnovec $(LIBS)
+
+runvec : tscvec.o dummy.o
+	$(CC) $(NOOPTFLAGS) dummy.o tscvec.o -o runvec $(LIBS)
+
+tscvec.o : tsc.c tscdef.h
+	$(CC) $(OPTFLAGS) $(VECFLAGS) $(EXTRAFLAGS) -DCOMPILE_OPTS="\"$(OPTFLAGS) $(VECFLAGS) $(EXTRAFLAGS)\"" -c \
+		-o tscvec.o tsc.c
+
+tscnovec.o : tsc.c tscdef.h
+	$(CC) $(OPTFLAGS) $(NOVECFLAGS) $(EXTRAFLAGS) -DCOMPILE_OPTS="\"$(OPTFLAGS) $(NOVECFLAGS) $(EXTRAFLAGS)\"" -c \
+		-o tscnovec.o tsc.c
+
+tsc.s : tsc.c dummy.o tscdef.h
+	$(CC) $(OPTFLAGS) $(EXTRAFLAGS) $(ASMLISTOPT) dummy.o tsc.c
+
+dummy.o : dummy.c
+	$(CC) -c dummy.c
+
+Makefile: Makefile.in config.status
+	./config.status --file=Makefile
+config.status: configure.ac
+	@if [ -s ../baseenv.h ] ; then \
+	    echo "Run configure in the baseenv directory" ; \
+	else \
+	    echo "Run configure in this directory first" ; \
+	fi
+	exit 1
+
+clean:
+	rm -f *.o runnovec runvec *.lst *.s
+realclean: clean
+	rm -f $(EXECS)
+distclean: realclean
+	rm -f config.log config.status
+	rm -rf autom4te.cache
+
+SOURCES      = tsc.c dummy.c
+DIST_COMMON  = configure.ac autogen.sh Makefile.in mergeresults \
+	mergesheets aclocal.m4 ax_compiler_vendor.m4
+DOC_FILES    = README license.txt
+HEADER_FILES = tsc.h
+DISTFILES    = $(SOURCES) $(DIST_COMMON) $(DOC_FILES) $(HEADER_FILES)
+DOC_SOURCES  = $(SOURCES)
+
+# The distalone target can be used for a standalone distribution of this test
+mydistdir = @PACKAGE_NAME@-@PACKAGE_VERSION@
+
+# Nothing to do as part of baseenv for this directory
+baseenvlib:
+bseenvprogs:
+
+# On OSX, Consider running xattr -rc * before running this target
+ALONEFILES = ../install-sh ../Makefile.doc ../Makefile.vec
+distalone: clean
+	@if [ ! -d $(mydistdir) ] ; then mkdir $(mydistdir) ; else \
+	    echo "$(mydistdir) found - delete and rerun make dist" ; exit 1; fi
+	for file in $(DISTFILES) $(ALONEFILES); do cp -p $$file $(mydistdir) ; done
+	(cd $(mydistdir) && ./autogen.sh)
+	(cd $(mydistdir) && chmod -R -N *)
+	if [ "`uname -s`" = "Darwin" ] ; then \
+	    (cd $(mydistdir) && xattr -rc * ); fi
+	tar czf $(mydistdir).tgz $(mydistdir)
+	rm -rf $(mydistdir)
+
+# This target is used with the baseenv package to contribute to the common
+# distribution tarball.
+dist: clean
+	@if [ "X$(distdir)" == "X" ] ; then echo "Set distdir" ; exit 1 ; fi
+	@if [ ! -d $(distdir) ] ; then mkdir $(distdir) ; fi
+	cp $(SOURCES) $(distdir)
+	if [ "X$(HEADER_FILES)" != "X" ] ; then \
+		cp $(HEADER_FILES) $(distdir) ; fi
+	cp $(DIST_COMMON) $(distdir)
+	if [ "X$(DOC_FILES)" != "X" ] ; then cp $(DOC_FILES) $(distdir) ; fi
+
+
+# Documentation targets
+mandoc: $(mandoc_path1) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_MAN_OPTIONS) -mpath $(mandoc_path1) -ext 1 \
+		$(DOC_SOURCES)
+htmldoc: $(htmldoc_path1) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_HTML_OPTIONS) -mpath $(htmldoc_path1) \
+		$(DOC_SOURCES)
+
+# The TSVC program are not installed; they should be run in place.
+install:
+
+.PHONY: clean realclean distclean dist all distalone mandoc htmldoc \
+	baseenvlib baseenvprogs

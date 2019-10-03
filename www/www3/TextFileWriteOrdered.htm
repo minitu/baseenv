@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>TextFileWriteOrdered</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="TextFileWriteOrdered"><H1>TextFileWriteOrdered</H1></A>
+Write ordered output to a TextFile 
+<H2>Synopsis</H2>
+<PRE>
+int TextFileWriteOrdered(TextFile fh, const char *buf, size_t len)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>fh  </B><DD>TextFile previously opened
+
+<DT><B>buf </B><DD>Data to write
+
+<DT><B>len </B><DD>Number of characters to write
+</DL>
+<P>
+<H2>Notes</H2>
+This routine writes to the file (or FILE handle) previously opened.  The
+output is ordered with respect to the rank in the communicator associated
+with the TextFile.  This is a collective routine; internally, it calls
+<tt>TextFileWriteFlush</tt> to output data.
+<P>
+<H2>Return value</H2>
+An error code.  Currently, <tt>MPI_SUCCESS</tt> is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.
+</BODY></HTML>

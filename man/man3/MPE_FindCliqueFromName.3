@@ -1,0 +1,52 @@
+.TH MPE_FindCliqueFromName 3 "4/23/2018" " " ""
+.SH NAME
+MPE_FindCliqueFromName \-  Given a name that is unique to a node, find the ranks of processes on the same node 
+.SH SYNOPSIS
+.nf
+int MPE_FindCliqueFromName(const char *name, MPI_Comm comm,
+int hintSize, int maxSize,
+int *cliqueNum, int *cliqueSize, int cliqueRanks[])
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B name 
+- name of the node on which the process is running
+.PD 1
+.PD 0
+.TP
+.B comm 
+- communicator 
+.PD 1
+.PD 0
+.TP
+.B hintSize 
+- Used to control initial hash size
+.PD 1
+.PD 0
+.TP
+.B maxSize 
+- Maximum number of ranks in cliqueRanks
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B cliqueNum 
+- Id of this clique, starting from zero
+.PD 1
+.PD 0
+.TP
+.B cliqueSize 
+- Number of processes in this clique
+.PD 1
+.PD 0
+.TP
+.B cliqueRanks 
+- Ranks of processes in this clique
+.PD 1
+
+.SH NOTE
+This is the general routine.  A number of convenience routines
+are provided to create communicators from cliques, and to return
+cliques in a communicator by using the node name.

@@ -1,0 +1,31 @@
+.TH TextFileWritePrintStats 3 "4/23/2018" " " ""
+.SH NAME
+TextFileWritePrintStats \-  Print performance statistics about a TextFile 
+.SH SYNOPSIS
+.nf
+int TextFileWritePrintStats(TextFile fh, FILE *fp)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B fh 
+- TextFile for which statistics should be printed
+.PD 1
+.PD 0
+.TP
+.B fp 
+- File handle for output (stdout is common)
+.PD 1
+
+.SH NOTES
+This routine is collective (it computes some min and max values over all
+processes in fh).  It makes no attempt to order the output; use
+TextFileWriteGetStats to access and control the output of this performance
+data.
+
+.SH RETURN VALUE
+An error code.  Currently, 
+.I MPI_SUCCESS
+is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.

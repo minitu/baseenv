@@ -1,0 +1,54 @@
+.TH topoMeshHopDistance 3 "1/3/2019" " " ""
+.SH NAME
+topoMeshHopDistance \-  Computing the distance from the calling process to the process with the given rank 
+.SH SYNOPSIS
+.nf
+int topoMeshHopDistance(topodist_t *dt, int rank, int *dist)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B dt 
+- Pointer to a valid topodist_t structure
+.PD 1
+.PD 0
+.TP
+.B rank 
+- Rank of the process to determine the distance to.  See notes.
+.PD 1
+
+.SH OUTPUT PARAMETER
+.PD 0
+.TP
+.B dist 
+- distance in hops to the process with rank 
+.I rank
+
+.PD 1
+
+.SH RETURN VALUE
+.I 0
+on success, non-zero otherwise.  
+.I -1
+if the topology does not include
+a mesh or torus.
+
+.SH NOTES
+.I rank
+must belong to one of the send ranks used to initialize the topodist_t
+.I dt
+\&.
+Thus, this routine is 
+.B not
+collective and may be used by any process
+at any time once 
+.I dt
+has been initialized.
+
+The distance is computing in 
+.B hops
+: this is the 1-norm or Manhatten distance
+between the calling process and the process with 
+.I rank
+in a mesh or torus
+topology.

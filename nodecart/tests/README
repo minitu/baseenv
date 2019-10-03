@@ -1,0 +1,37 @@
+Test and Demonstration programs for nodecart
+
+Performance Demonstrations
+ncartperf - This is a program that can be used to explore the performance
+            benefits of using the nodecart approach for MPI_Cart_create
+
+Test Programs
+hdecomp - Test of a 2-level decomposition
+layout  - Create a file with the mapping of processes
+ncarttest - Test of the ncart routines
+
+Test of MPI_Cart_create replacement
+shimtest  - C version.  Tests to see if the shims properly intercept calls
+            to MPI_Cart_create and friends
+shimtestf - Fortran version
+
+
+Interpreting the tests
+hdecomp - This program tests some of the internal routines in nodecart. The
+          output must be manually examined.  This routine is only useful
+          when debugging those internal routines (decompDims and rankToCoords)
+layout -  Writes out the mapping of processes of mapping.txt, giving the rank in
+          MPI_COMM_WORLD (wrank), the rank of the node on which the process is
+	  running (nrank) and number of processes on that node (nsize),
+	  the rank on the node (ronnode), the rank of the chip on the node
+	  (rchip) and the rank of the process on the chip (ronchip).  The
+	  chip information is only available on some systems as it requires
+	  additional, non-portable information. In correct operation, three
+	  Layouts are generated: MPI_COMM_WORLD, ncart (in the rank order of
+	  MPI_COMM_WORLD), and ncart (in the rank order of ncart).
+ncarttest - Prints out information about the nodes, creates a Cartesian
+	  communicator, and prints the neighbors (by rank) in the Cartesian
+	  directions.  The output of this program must be examined by hand.
+
+shimtest - Both print "Test PASSED" on success.
+shimtestf
+

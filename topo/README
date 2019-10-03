@@ -1,0 +1,49 @@
+Return the basic topology of the calling thread.
+
+This returns information in a hierarchy about the calling thread.  The
+basic information about the node is provided by hwloc (where available)
+and combined with information about the placement of the node on the system.
+
+This information is intended to be used to understand the layout of the
+threads and processes on the hardware, to compute communication distances,
+and to permit better layout of communicating objects on the physical topology.
+
+The representation is this.  For each level
+
+#define MAX_TOPO_DIM 5
+int numLevels;  // Number of levels
+typedef enum { TOPO_UNKNOWN, TOPO_TORUS, TOPO_MESH, TOPO_BUS, TOPO_TREE }
+	topoType_t;
+typedef struct { int coords[MAX_TOPO_DIM]; } topoCoord_t;
+typedef struct {
+ topoType_t  topoType;      // unknown, torus, mesh, bus, tree
+ int         dim,           // number of dimensions in topology
+             nSiblings,     // Number of siblings
+             nChildren,     // Number of children
+             nParents;      // Number of Parents
+ topoCoord_t coords;        // coordinates in topology
+ topoCoord_t maxcoords;     // maximum value of valid coordinates
+ topoCoord_t *parentCoords;
+ topoCoord_t *childCoords;
+ topoCoord_t *siblingsCoords;
+} topoinfo_t;
+
+Question: add maxcoords for job (e.g., max coords is for the entire system)
+
+This is a simpler layout than hwloc provide for the node, but will often
+be sufficient (and this provides information not captured in hwloc, in
+terms of the topology. 
+
+Tree: In a tree topology, each level (value of type topoinfo_t) describes
+the nodes at the same tree depth.  The coordinates are a path from this node
+to the root.
+
+parentCoords, childCoords, and siblingCoords can be null, in which case they
+are not
+
+Distance model:
+If the topology type is mesh or torus, by default, the immediate neighbors
+are the processes that are +1 or -1 in each of the coordinate directions.
+
+Contention model:
+Given a communication pattern from each node, and a routing rule, 

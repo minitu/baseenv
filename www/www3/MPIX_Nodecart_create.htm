@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPIX_Nodecart_create</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPIX_Nodecart_create"><H1>MPIX_Nodecart_create</H1></A>
+Create a Cartesian communicator, using information about which nodes are on the same process. 
+<H2>Synopsis</H2>
+<PRE>
+int MPIX_Nodecart_create(MPI_Comm comm_old, int ndims, const int dims[],
+             const int periods[], int reorder, MPI_Comm *comm_cart)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>comm_old </B><DD>input communicator (handle)
+
+<DT><B>ndims </B><DD>number of dimensions of Cartesian grid (integer)
+
+<DT><B>dims </B><DD>integer array of size ndims specifying the number of processes in
+each dimension
+
+<DT><B>periods </B><DD>logical array of size ndims specifying whether the grid is
+periodic (true) or not (false) in each dimension
+
+<DT><B>reorder </B><DD>ranking may be reordered (true) or not (false) (logical)
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL><DT><B>comm_cart </B> <DD> communicator with new Cartesian topology (handle)
+</DL>
+<P>
+<H2>Notes</H2>
+Like <tt>MPI_Cart_create</tt>, the values for dims must be provided on input.
+An option to consider is to allow zero values for elements of dims,
+and then let this routine choose the dimensions to best fit the underlying
+physical hardware.
+<P>
+The routine <tt>MPIX_Comm_dims_create</tt> may be used to determine good values
+for <tt>dims</tt>.
+<P>
+The control variable <tt>cvar_nodecart_verbose</tt> may be set to a positive value
+to cause output to be generated about this routine's operation.
+</BODY></HTML>

@@ -1,0 +1,261 @@
+all: all-redirect
+
+# Set the basic directories
+prefix           = @prefix@
+exec_prefix      = @exec_prefix@
+datarootdir      = @datarootdir@
+docdir           = @docdir@
+abs_builddir     = @abs_builddir@
+abs_top_builddir = @abs_top_builddir@
+builddir         = @builddir@
+top_builddir     = @top_builddir@
+abs_srcdir       = @abs_srcdir@
+abs_top_srcdir   = @abs_top_srcdir@
+
+includedir       = @includedir@
+libdir           = @libdir@
+bindir           = @bindir@
+mandir           = @mandir@
+htmldir          = @htmldir@
+
+master_top_builddir = @master_top_builddir@
+master_top_srcdir   = @master_top_srcdir@
+include $(master_top_srcdir)/Makefile.doc
+
+
+MPI_DIR = @MPI_DIR@
+# Some systems may want to add -static to the MPICC line
+MPICC   = @MPICC@
+MPIFORT = @MPIFORT@
+
+DOCTEXT = @DOCTEXT@
+MKDIR_P = @MKDIR_P@
+
+INSTALL         = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA    = @INSTALL_DATA@
+
+CPPFLAGS = @DEFS@
+CFLAGS   = @CFLAGS@
+EXECS =
+
+.SUFFIXES =
+
+distdir = @PACKAGE_NAME@-@PACKAGE_VERSION@
+# topo seq mpit libtopodisc
+# The autoconf variable subdirs is those passed to AC_CONFIG_SUBDIRS
+# Note that subdirs is processed early - this is because the subdirs
+# may provide tools needed in the other codes, particularly the
+# performance measurement codes
+SUBDIRS           = seq mputil util mpit io @subdirs@ nodeperf mpi-patterns \
+		    nodecart
+ALLSUBDIRS        = seq mputil util mpit io topo libtopodisc perftest nodeperf \
+                    mpi-patterns haloperf nodecart TSVC gpuvec
+EXTERNSUBDIRS     = @externsubdirs@
+OTHERDIRS         = confdb
+# disttargsubdirs are the subdirectories with a dist target that can be used
+# with the dist target in this directory.
+DISTTARGSUBDIRS   = seq mputil util mpit io topo nodeperf mpi-patterns \
+		    perftest haloperf nodecart TSVC gpuvec
+# distsubdirs are the subdirectories that are simply copied into the "distdir"
+# directory.  The union of DISTTARGSUBDIRS and DISTSUBDIRS should be the
+# same as ALLSUBDIRS
+DISTSUBDIRS       = libtopodisc
+DISTFILES         = Makefile.in Makefile.vec Makefile.doc README \
+			baseenv.h.in configure configure.ac \
+			install-sh aclocal.m4 config.sub config.guess \
+			INSTALL NOTES
+
+# Default rules to force use of the MPI compilers
+.c.o:	$?
+	$(MPICC) $(CFLAGS) $(CPPFLAGS) -c $(?) -o $(@)
+.f.o:   $?
+	$(MPIFORT) $(FFLAGS) -c $(?) -o $(@)
+.f90.o: $?
+	$(MPIFORT) $(FFLAGS) -c $(?) -o $(@)
+
+default:
+
+all-redirect: libbaseenv.a baseenv-progs shims
+
+libbaseenv.a: buildlibsubdirs
+	@RANLIB@ libbaseenv.a
+libbaseenvf.a: buildlibfsubdirs
+	@RANLIB@ libbaseenvf.a
+
+baseenv-progs: buildprogssubdirs
+shims:
+	(cd nodecart && $(MAKE) shims)
+
+baseenvgit.h:
+	if [ -d .git ] ; then \
+	    git rev-parse HEAD | \
+	    sed -e 's/\(.*\)/#define BASEENV_GITHASH "\1"/' > baseenvgit.h ; \
+	else \
+	    echo '#define BASEENV_GITHASH "Unknown"' >> baseenvgit.h ;\
+	fi
+buildlibsubdirs:
+	@for dir in $(SUBDIRS) $(EXTERNSUBDIRS) ; do\
+	    echo "Making in $$dir ..." ; \
+	    (cd $$dir && $(MAKE) baseenvlib) ; \
+	done
+buildlibfsubdirs:
+	@for dir in nodecart ; do\
+	    echo "Making in $$dir ..." ; \
+	    (cd $$dir && $(MAKE) baseenvlibf) ; \
+	done
+buildprogssubdirs:
+	@for dir in $(SUBDIRS) $(EXTERNSUBDIRS) ; do\
+	    echo "Making in $$dir ..." ; \
+	    (cd $$dir && $(MAKE) baseenvprogs) ; \
+	done
+
+install: install-dirs install-libraries install-headers install-man \
+		install-html
+	for dir in $(SUBDIRS) ; do \
+	    if [ -s "$$dir/Makefile" ] ; then \
+		echo "Install in $$dir..." ; \
+		(cd $$dir && $(MAKE) DESTDIR=$(DESTDIR) install ) ; \
+	    fi ; done
+
+install-dirs:
+	if [ ! -d "$(DESTDIR)$(prefix)" ] ; then \
+		$(MKDIR_P) "$(DESTDIR)$(prefix)" ; fi
+	if [ ! -d "$(DESTDIR)$(includedir)" ] ; then \
+		$(MKDIR_P) "$(DESTDIR)$(includedir)" ; fi
+	if [ ! -d "$(DESTDIR)$(libdir)" ] ; then \
+		$(MKDIR_P) "$(DESTDIR)$(libdir)" ; fi
+	if [ ! -d "$(DESTDIR)$(mandir)" ] ; then \
+		$(MKDIR_P) "$(DESTDIR)$(mandir)" ; fi
+	if [ ! -d "$(DESTDIR)$(mandir)/man1" ] ; then \
+		$(MKDIR_P) "$(DESTDIR)$(mandir)/man1" ; fi
+	if [ ! -d "$(DESTDIR)$(mandir)/man3" ] ; then \
+		$(MKDIR_P) "$(DESTDIR)$(mandir)/man3" ; fi
+	if [ ! -d "$(DESTDIR)$(htmldir)" ] ; then \
+		$(MKDIR_P) "$(DESTDIR)$(htmldir)" ; fi
+	if [ ! -d "$(DESTDIR)$(htmldir)/www1" ] ; then \
+		$(MKDIR_P) "$(DESTDIR)$(htmldir)/www1" ; fi
+	if [ ! -d "$(DESTDIR)$(htmldir)/man3" ] ; then \
+		$(MKDIR_P) "$(DESTDIR)$(htmldir)/www3" ; fi
+	if [ ! -d "$(DESTDIR)$(bindir)" ] ; then \
+		$(MKDIR_P) "$(DESTDIR)$(bindir)" ; fi
+
+install-libraries:
+	$(INSTALL_DATA) libbaseenv.a $(DESTDIR)$(libdir)/libbaseenv.a
+	if [ -s libbaseenvf.a ] ; then \
+	    $(INSTALL_DATA) libbaseenvf.a $(DESTDIR)$(libdir)/libbaseenvf.a ; \
+	fi
+install-headers:
+	$(INSTALL_DATA) baseenv.h $(DESTDIR)$(includedir)/baseenv.h
+
+install-man:
+	for file in `find man -type f | sed -e 's%^man/%%g'` ; do \
+	    $(INSTALL_DATA) man/$$file $(DESTDIR)$(mandir)/$$file ; \
+	done
+install-html:
+	for file in `find www -type f | sed -e 's%^www/%%g'` ; do \
+	    $(INSTALL_DATA) www/$$file $(DESTDIR)$(htmldir)/$$file ; \
+	done
+
+Makefile: Makefile.in config.status
+	./config.status
+
+clean:
+	@rm -f *.o *.ps *.pdf
+	@for dir in $(SUBDIRS) ; do \
+	    if [ -s "$$dir/Makefile" ] ; then \
+		echo "make clean in $$dir" ; \
+		(cd $$dir && $(MAKE) clean) ; \
+	    fi ; done
+
+realclean: clean
+	rm -f $(EXECS) *.exe *.stackdump
+	for dir in $(SUBDIRS) ; do \
+	    if [ -s "$$dir/Makefile" ] ; then \
+		echo "make realclean in $$dir" ; \
+		(cd $$dir && $(MAKE) realclean) ; \
+	    fi ; done
+
+distclean: realclean
+	for dir in $(SUBDIRS) ; do \
+	    if [ -s "$$dir/Makefile" ] ; then (cd $$dir && $(MAKE) distclean) ; \
+	    fi ; done
+	rm -f config.log config.status
+	rm -rf autom4te.cache
+
+# On OSX, Consider running xattr -rc * before running this target
+# (c for clear - d <attr> to delete a specific attribute)
+# This will add the html documentation pages if they have been built
+# in directory www.  Use "make htmldoc" and "make mandoc" first
+# Note two versions of rev-parse to get the git hash.  This is a todo to
+# fix.
+dist: clean
+	@if [ ! -d $(distdir) ] ; then mkdir $(distdir) ; else \
+	    echo "$(distdir) found $(distdir) - delete it and rerun make dist" ; exit 1; fi
+	@if [ -d .git ] ; then\
+	    git rev-parse HEAD | \
+	    sed -e 's/\(.*\)/#define BASEENV_GITHASH "\1"/' > $(distdir)/baseenvgit.h ; \
+	fi
+	git rev-parse --short HEAD > $(distdir)/githash
+	for dir in $(DISTTARGSUBDIRS) ; do \
+		echo "make dist in $$dir" ; \
+		(cd $$dir && $(MAKE) distdir=../$(distdir)/$$dir dist ) ; done
+	for dir in $(DISTSUBDIRS) $(OTHERDIRS) ; do \
+		echo "copy $$dir to $(distdir)" ; \
+		cp -rp $$dir $(distdir) ; done
+	@echo "Copy $(DISTFILES) to $(distdir)"
+	for file in $(DISTFILES) ; do cp -p $$file $(distdir) ; done
+	if [ X$(FPMPI) != X ] ; then \
+	     if [ -d $(FPMPI) ] ; then \
+		(cd $(FPMPI) && make dist ) ; \
+	        (cd $(distdir) && tar zxf $(FPMPI)/fpmpi2-2.3.tar.gz ) ; \
+	     fi ; \
+	fi
+	if [ -d www ] ; then cp -rp www $(distdir) ; fi
+	if [ -d man ] ; then cp -rp man $(distdir) ; fi
+	(cd $(distdir) && autoreconf -if)
+	@for dir in $(DISTSUBDIRS) $(OTHERDIRS); do \
+		rm -f $(distdir)/$$dir/Makefile ; done
+	(cd $(distdir) && find . -name 'autom4te*' -print | xargs rm -rf)
+	(cd $(distdir) && find . -name '.svn' -print | xargs rm -rf)
+	(cd $(distdir) && find . -name '*~' -print | xargs rm -f)
+	(cd $(distdir) && find . -name '*.dSYM' -print | xargs rm -rf)
+	if [ "`uname -s`" = "Darwin" ] ; then \
+	    (cd $(distdir) && xattr -rc * ); fi
+	(cd $(distdir) && chmod -R -N *)
+	rm -f $(distdir)/Makefile $(distdir)/config.status
+	tar czf $(distdir).tgz $(distdir)
+	rm -rf $(distdir)
+
+hwlocupdate:
+	echo "Need to update hwloc.  Download and install."
+
+# Targets to make the documentation
+MANDOC_OPTIONS="-quotefmt"
+HTMLDOC_OPTIONS="-html -dosnl -quotefmt"
+mandoc:
+	@for dir in $(SUBDIRS) $(EXTERNSUBDIRS) ; do\
+	    echo "Making mandoc in $$dir ..." ; \
+	    (cd $$dir && $(MAKE) mandoc) ; \
+	done
+	$(MAKE) mandoc-local
+mandoc-local:
+
+#	${DOCTEXT} -quotefmt -mpath ${mandir}/man1 -ext 1 ${doc_SOURCES}
+
+# The documentation program appends to baseenv.cit, so we must remove it
+# before building the documentation.
+htmldoc:
+	rm -f $(htmldoc_path)/baseenv.cit
+	@for dir in $(SUBDIRS) $(EXTERNSUBDIRS) ; do\
+	    echo "Making htmldoc in $$dir ..." ; \
+	    (cd $$dir && $(MAKE) htmldoc) ; \
+	done
+	$(MAKE) htmldoc-local
+
+htmldoc-local:
+	maint/createhtmlindex
+
+.PHONY: libbaseenv.a baseenvlib baseenvprogs \
+	clean realclean distclean dist buildlibsubdirs buildprogssubdirs \
+	mandoc mandoc-local htmldoc htmldoc-local

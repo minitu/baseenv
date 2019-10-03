@@ -1,0 +1,52 @@
+.TH TextFileWritePrintf 3 "4/23/2018" " " ""
+.SH NAME
+TextFileWritePrintf \-  Write ordered output to a file, using printf-style 
+.SH SYNOPSIS
+.nf
+int TextFileWritePrintf(TextFile fh, const char *restrict format, ...)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B fh  
+- TextFile previously opened
+.PD 1
+.PD 0
+.TP
+.B format 
+- 
+.I printf
+style format
+.PD 1
+.PD 0
+.TP
+.B ... 
+- Parameters for the 
+.I format
+\&.
+
+.PD 1
+
+.SH NOTES
+This routine writes to the file (or FILE handle) previously opened.  The
+output is ordered with respect to the rank in the communicator associated
+with the TextFile.  The output is buffered in this routine; a collective
+call to 
+.I TextFileWriteFlush
+is requried to ensure that the data is output.
+The usage is nearly identical to 
+.I fprintf
+; the only difference is that
+instead of a 
+.I FILE
+as the first parameter, a 
+.I TextFile
+must be provided.
+
+.SH RETURN VALUE
+An error code.  Currently, 
+.I MPI_SUCCESS
+is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.
+

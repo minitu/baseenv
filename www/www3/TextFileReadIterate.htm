@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>TextFileReadIterate</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="TextFileReadIterate"><H1>TextFileReadIterate</H1></A>
+Process all lines in a file 
+<H2>Synopsis</H2>
+<PRE>
+int TextFileReadIterate(TextFile fh,
+                      int (*processline)(const char *, int len, void *),
+                      void *extra_data)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>fh </B><DD>TextFile handle
+
+<DT><B>processline </B><DD>Routine to process an input line
+
+<DT><B>extra_data </B><DD>Pointer to extra data for processline
+</DL>
+<P>
+</BODY></HTML>

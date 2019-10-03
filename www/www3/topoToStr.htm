@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topoToStr</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topoToStr"><H1>topoToStr</H1></A>
+Create a one-line description of the topology, suitable for printing 
+<H2>Synopsis</H2>
+<PRE>
+int topoToStr(topoinfo_t *topo, int incname, char *str, int len)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>topo </B><DD>Pointer to topology information
+
+<DT><B>incname </B><DD>if true, include the string name of each element of the topology
+
+<DT><B>len </B><DD>size of <tt>str
+</tt>
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL><DT><B>str </B> <DD> Pointer to a <tt>char</tt> array that will contain the description of the
+topology.
+</DL>
+<P>
+<H2>Return value</H2>
+0 on success, non-zero on failure.
+<P>
+</BODY></HTML>

@@ -1,0 +1,1 @@
+int setupIrecvTest( HaloTest *self );

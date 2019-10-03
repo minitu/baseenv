@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>seqChangeOrder</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="seqChangeOrder"><H1>seqChangeOrder</H1></A>
+Change the order in which processes proceed through a sequential section 
+<H2>Synopsis</H2>
+<PRE>
+void seqChangeOrder( MPI_Comm comm, int prev, int next )
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>comm </B><DD>The communicator containing all processes for the sequential section
+
+<DT><B>prev </B><DD>The rank of the previous process
+
+<DT><B>next </B><DD>The rank of the next process
+</DL>
+<P>
+<H2>Notes</H2>
+This routine changes the order in which the processes in <tt>comm</tt> proceed in
+a sequential section begun with <tt>seqBegin</tt>.  While not a collective routine,
+it is the users' responsibility to ensure that the specification of <tt>prev
+</tt>and <tt>next</tt> contains on cycles and all processes are reachable.
+<P>
+The process for which <tt>prev</tt> is <tt>MPI_PROC_NULL</tt> goes first; the last process
+must have <tt>MPI_PROC_NULL</tt> for the <tt>next</tt> value.
+</BODY></HTML>

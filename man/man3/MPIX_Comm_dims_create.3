@@ -1,0 +1,51 @@
+.TH MPIX_Comm_dims_create 3 "1/3/2019" " " ""
+.SH NAME
+MPIX_Comm_dims_create \-  Creates a division of processors within a given communicator in a Cartesian grid 
+.SH SYNOPSIS
+.nf
+int MPIX_Comm_dims_create(MPI_Comm comm, int nnodes, int ndims, int dims[])
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B comm  
+- Communicator (handle)
+.PD 1
+.PD 0
+.TP
+.B nnodes 
+- number of nodes in a grid (integer)
+.PD 1
+.PD 0
+.TP
+.B ndims 
+- number of Cartesian dimensions (integer)
+.PD 1
+
+.SH INPUT/OUTPUT PARAMETERS
+.PD 0
+.TP
+.B dims 
+- integer array of size  
+.I ndims
+specifying the number of nodes in each
+dimension. All entries (for 
+.I ndims
+) are filled in; unlike 
+.I MPI_Dims_create
+,
+values in 
+.I dims
+do not set the size for that dimension.
+.PD 1
+
+.SH NOTES
+Unlike 
+.I MPI_Dims_create
+, this is a collective routine over 
+.I comm
+\&.
+This
+permits the implementation to perform collective communication operations to
+determine good decompositions.
+

@@ -1,0 +1,24 @@
+.TH spmv-c 1 "7/11/2016" " " ""
+.SH NAME
+spmv-c \-  Report the performance of an example sparse matrix-vector multiply 
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B n 
+- The mesh size for the matrix.  The number of rows in the matrix is
+n*n
+.PD 1
+
+.SH NOTES
+This routine is an example of sparse matrix-vector multiply, using
+CSR (compressed sparse row format).  Because this code is in C, the
+index values in the 
+.I ia
+and 
+.I ja
+arrays are zero origin rather than one
+origin as they would be in Fortran.
+
+While this code does time the sparse matrix-vector product,
+these timings are too simple to be used for serious analysis.
+

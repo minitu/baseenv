@@ -1,0 +1,146 @@
+ALL: all-redirect
+
+# Set the basic directories
+prefix           = @prefix@
+exec_prefix      = @exec_prefix@
+datarootdir      = @datarootdir@
+abs_builddir     = @abs_builddir@
+abs_top_builddir = @abs_top_builddir@
+builddir         = @builddir@
+top_builddir     = @top_builddir@
+abs_srcdir       = @abs_srcdir@
+abs_top_srcdir   = @abs_top_srcdir@
+
+includedir       = @includedir@
+libdir           = @libdir@
+bindir           = @bindir@
+
+master_top_builddir = @master_top_builddir@
+master_top_srcdir   = @master_top_srcdir@
+include $(master_top_srcdir)/Makefile.doc
+
+MPICC           = @CC@
+RANLIB          = @RANLIB@
+INSTALL         = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA    = @INSTALL_DATA@
+
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@ -DUSE_ROW_MAJOR -I..
+LDFLAGS = @LDFLAGS@
+COPT = @COPT@
+FCOPT = @FCOPT@
+EXTRA_LIBS = @BASEENV_LIB@ @LIBS@ @HWLOCLIB@
+
+MKDIR_P = @MKDIR_P@
+DOCTEXT = @DOCTEXT@
+
+GENERATEDFILES =
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+.c.o:
+	$(MPICC) -c $(CFLAGS) $(CPPFLAGS) $(COPT) $<
+
+nodecart_HEADERS   = nodecart.h
+nodecart_SOURCES   = nodecart.c nodesockets.c
+nodecart_OBJECTS   = $(nodecart_SOURCES:.c=.o)
+nodecart_EXTRALIBS =
+ncartshim_SOURCES  = ncartshim.c
+ncartshim_HEADERS  = ncartshim.h
+ncartshimf_SOURCES = ncartshimf.c
+
+# Include the Fortran interface in the sources
+SOURCES      = $(nodecart_SOURCES) nodecartf.c \
+		$(ncartshim_SOURCES) $(ncartshimf_SOURCES)
+HEADER_FILES = $(nodecart_HEADERS) $(ncartshim_HEADERS)
+DIST_COMMON  = Makefile.in
+DOC_FILES    = README
+DOC_SOURCES  = $(nodecart_SOURCES)
+SUBDIRS      = tests
+
+
+EXECS =
+BASEENV_LIB = @BASEENV_LIB@
+BASEENVF_LIB = @BASEENVF_LIB@
+
+all-redirect: $(EXECS)
+
+baseenvprogs: $(EXECS)
+# We use sleep to keep make from making incorrect decisions about whether
+# the library is up-to-date in some succeeding step
+$(BASEENV_LIB): $(nodecart_OBJECTS)
+	@for dir in $(SUBDIRS) ; do\
+	    (cd $$dir && $(MAKE) $(BASEENV_LIB) ) ; \
+	done
+	ar cr $(BASEENV_LIB) $(nodecart_OBJECTS)
+	$(RANLIB) $(BASEENV_LIB)
+	sleep 1
+$(BASEENVF_LIB): nodecartf.o
+	@for dir in $(SUBDIRS) ; do\
+	    (cd $$dir && $(MAKE) $(BASEENVF_LIB) ) ; \
+	done
+	ar cr $(BASEENVF_LIB) nodecartf.o
+	$(RANLIB) $(BASEENVF_LIB)
+	sleep 1
+baseenvlib: $(BASEENV_LIB)
+baseenvlibf: $(BASEENVF_LIB)
+shims: ncartshimf.o ncartshim.o
+
+shifttest: shifttest.c nodecart.c nodesocket.c
+	$(MPICC) -o shifttest -DPRIVATE= $(CFLAGS) $(CPPFLAGS) \
+		shifttest.c nodecart.c nodesocket.c
+
+
+Makefile: Makefile.in ../config.status
+	(cd .. && ./config.status --file=nodecart/Makefile)
+../config.status: ../configure.ac
+	(cd .. && ./autogen.sh)
+
+nodecart.o: $(nodecart_SOURCES) $(nodecart_HEADERS) ../baseenv.h
+
+ndebug: nodecart.c nodesockets.c nodecart.h
+	$(MPICC) -o ndebug -g -DDEBUG_DECOMP nodecart.c nodesockets.c
+
+ncartshim.o: ncartshim.c nodecart.h
+ncartshimf.o: ncartshimf.c nodecart.h
+
+clean:
+	rm -f *.o *~
+
+realclean: clean
+	rm -f $(EXECS) ndebug
+
+distclean: realclean
+	rm -f config.log config.status $(GENERATEDFILES) *.a
+	rm -rf autom4te.cache
+	rm -f heat*.svg
+
+dist:
+	@if [ "X$(distdir)" == "X" ] ; then echo "Set distdir" ; exit 1 ; fi
+	@if [ ! -d $(distdir) ] ; then mkdir $(distdir) ; fi
+	cp $(SOURCES) $(distdir)
+	cp $(HEADER_FILES) $(distdir)
+	cp $(DIST_COMMON) $(distdir)
+	for dir in $(SUBDIRS) ; do \
+		(cd $$dir && $(MAKE) distdir=../$(distdir)/$$dir dist ) ; done
+	if [ "X$(DOC_FILES)" != "X" ] ; then cp $(DOC_FILES) $(distdir) ; fi
+
+# Documentation targets
+mandoc: $(mandoc_path3) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_MAN_OPTIONS) -mpath $(mandoc_path3) -ext 3 \
+		$(DOC_SOURCES)
+htmldoc: $(htmldoc_path3) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_HTML_OPTIONS) -mpath $(htmldoc_path3) \
+		$(DOC_SOURCES)
+
+install:
+	for file in $(HEADER_FILES) ; do \
+	     $(INSTALL_DATA) $$file $(DESTDIR)$(includedir)/$$file ; \
+	done
+	for file in ncartshimf.o ncartshim.o ; do \
+	    if [ -s $$file ] ; then \
+		$(INSTALL_DATA) $$file $(DESTDIR)$(libdir)/$$file ; \
+	    fi ; done
+
+.PHONY: baseenvlib baseenvprogs clean realclean distclean

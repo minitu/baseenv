@@ -1,0 +1,25 @@
+.TH seqBegin 3 "1/3/2019" " " ""
+.SH NAME
+seqBegin \-  Begin a sequential section 
+.SH SYNOPSIS
+.nf
+void seqBegin( MPI_Comm comm )
+.fi
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B comm 
+- Communicator of all processes involved in sequential section
+.PD 1
+
+.SH NOTES
+This routine is collective over the 
+.I comm
+; only one process at a time
+executes the code between the call to this routine and to 
+.I seqEnd
+;
+the others wait.  The processes execute in rank order (in 
+.I comm
+)
+

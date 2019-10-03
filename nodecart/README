@@ -1,0 +1,27 @@
+This directory contains routines that provide an alternative
+implementation of the MPI Cartesian topology routines.
+
+This uses completely portable code - it uses Comm_split_type to find nodes.
+No interconnect network information is used.
+
+To illustrate the use and value of these routines, the program ncartperf
+measures the performance of using a communicator created with MPI_Cart_create
+and with MPIX_Nodecart_create along with the corresponding shift routines
+to send data for a 2 and 3-D mesh (along only the principal coordinate
+directions).  To use (in this case, 1024 process with 16 processes/node)
+
+mpiexec -n 1024 ./ncartperf -o n.txt --nodes 16:64*2
+
+Message sizes can be controlled with --sizes a:b*c , which uses messages (in
+doubles) of length a, a*c, a*c*c, up to b. (a:b:c uses a, a+c, a+2c, ...)
+
+Output is sent to stdout unless the -o option is used; in that case, output
+goes to the named file.
+
+
+nodecart can be built to support either ROW_MAJOR (the MPI choice) or
+COLUMN_MAJOR ordering for the processes.  Use use COLUMN_MAJOR, change the
+Makefile to define USE_COLUMN_MAJOR and remove the definition of USE_ROW_MAJOR.
+
+nodecart.o can be built to export some of the internal routines.  To do this,
+define PRIVATE as empty, as in -DPRIVATE= .

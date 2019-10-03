@@ -1,0 +1,32 @@
+.TH topoTypeStr 3 "4/23/2018" " " ""
+.SH NAME
+topoTypeStr \-  Return a string name for a topology type 
+.SH SYNOPSIS
+.nf
+const char *topoTypeStr(topoType_t t)
+.fi
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B t 
+- A 
+.I topoType_t
+value
+.PD 1
+
+.SH RETURN VALUE
+A string name for the topology type.  On error, returns 
+.I invalid topo type!
+The known names include 
+.I torus
+, 
+.I mesh
+, 
+.I socket
+, and 
+.I core
+\&.
+
+
+.SH THREAD SAFETY
+This routine is thread safe.

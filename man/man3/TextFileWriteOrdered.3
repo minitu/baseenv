@@ -1,0 +1,37 @@
+.TH TextFileWriteOrdered 3 "4/23/2018" " " ""
+.SH NAME
+TextFileWriteOrdered \-  Write ordered output to a TextFile 
+.SH SYNOPSIS
+.nf
+int TextFileWriteOrdered(TextFile fh, const char *buf, size_t len)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B fh  
+- TextFile previously opened
+.PD 1
+.PD 0
+.TP
+.B buf 
+- Data to write
+.PD 1
+.PD 0
+.TP
+.B len 
+- Number of characters to write
+.PD 1
+
+.SH NOTES
+This routine writes to the file (or FILE handle) previously opened.  The
+output is ordered with respect to the rank in the communicator associated
+with the TextFile.  This is a collective routine; internally, it calls
+.I TextFileWriteFlush
+to output data.
+
+.SH RETURN VALUE
+An error code.  Currently, 
+.I MPI_SUCCESS
+is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.

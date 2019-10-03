@@ -1,0 +1,118 @@
+all: all-redirect
+
+.SUFFIXES =
+.SUFFIXES = .c .f .f90 .o
+
+# Set the basic directories
+prefix           = @prefix@
+exec_prefix      = @exec_prefix@
+datarootdir      = @datarootdir@
+abs_builddir     = @abs_builddir@
+abs_top_builddir = @abs_top_builddir@
+builddir         = @builddir@
+top_builddir     = @top_builddir@
+abs_srcdir       = @abs_srcdir@
+abs_top_srcdir   = @abs_top_srcdir@
+
+includedir       = @includedir@
+libdir           = @libdir@
+bindir           = @bindir@
+
+master_top_builddir = @master_top_builddir@
+master_top_srcdir   = @master_top_srcdir@
+include $(master_top_srcdir)/Makefile.doc
+
+MPI_DIR = @MPI_DIR@
+# Some systems may want to add -static to the MPICC line
+MPICC           = @MPICC@
+MPIFORT         = @MPIFORT@
+#MPIEXEC = @MPIEXEC@
+#MPIEXEC_NP = @MPIEXEC_NP@
+RANLIB          = @RANLIB@
+MKDIR_P         = @MKDIR_P@
+INSTALL         = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA    = @INSTALL_DATA@
+DOCTEXT         = @DOCTEXT@
+
+CPPFLAGS = @DEFS@
+CFLAGS = @CFLAGS@
+COPT = @COPT@
+FCOPT = @FCOPT@
+SUBDIRS =
+
+EXECS =
+BASEENV_LIB = @BASEENV_LIB@
+OTHEREXECS = seqex
+OTHEROBJS  = seqex.o
+
+SOURCES      = seq.c seqex.c
+HEADER_FILES = seq.h
+DIST_COMMON  = Makefile.in
+DOC_FILES    =
+DOC_SOURCES  = $(SOURCES) $(HEADER_FILES)
+
+# Default rules to force use of the MPI compilers
+.c.o:	$?
+	$(MPICC) $(CFLAGS) $(COPT) $(CPPFLAGS) -c $(?) -o $(@)
+.f.o:   $?
+	$(MPIFORT) $(FFLAGS) $(FCOPT) -c $(?) -o $(@)
+.f90.o: $?
+	$(MPIFORT) $(FFLAGS) $(FCOPT) -c $(?) -o $(@)
+
+default:
+
+all-redirect: $(BASEENV_LIB)
+
+# We use sleep to keep make from making incorrect decisions about whether
+# the library is up-to-date in some succeeding step
+$(BASEENV_LIB): seq.o
+	@for dir in $(SUBDIRS) ; do\
+	    (cd $$dir && $(MAKE)) ; \
+	done
+	ar cr $(BASEENV_LIB) seq.o
+	$(RANLIB) $(BASEENV_LIB)
+	sleep 1
+
+baseenvlib: $(BASEENV_LIB)
+baseenvprogs:
+
+seqex: seqex.o $(BASEENV_LIB)
+	$(MPICC) $(CFLAGS) $(COPT) $(LDFLAGS) -o seqex seqex.c $(BASEENV_LIB)
+
+Makefile: Makefile.in ../config.status
+	(cd .. && ./config.status --file=seq/Makefile)
+
+clean:
+	rm -f *.o *.ps *.pdf $(OTHEROBJS) fpmpi_profile.txt *.chkpt *~
+	for dir in $(SUBDIRS) ; do (cd $$dir && $(MAKE) clean) ; done
+
+realclean:
+	rm -f $(EXECS) $(OMPEXECS) $(OTHEREXECS) *.exe *.stackdump
+	for dir in $(SUBDIRS) ; do (cd $$dir && $(MAKE) realclean) ; done
+
+distclean: realclean
+	for dir in $(SUBDIRS) ; do (cd $$dir && $(MAKE) distclean) ; done
+	rm -f config.log config.status
+	rm -rf autom4te.cache
+
+dist: distclean
+	@if [ "X$(distdir)" == "X" ] ; then echo "Set distdir" ; exit 1 ; fi
+	@if [ ! -d $(distdir) ] ; then mkdir $(distdir) ; fi
+	cp $(SOURCES) $(distdir)
+	cp $(HEADER_FILES) $(distdir)
+	cp $(DIST_COMMON) $(distdir)
+	if [ "X$(DOC_FILES)" != "X" ] ; then cp $(DOC_FILES) $(distdir) ; fi
+
+# Documentation targets
+mandoc: $(mandoc_path3) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_MAN_OPTIONS) -mpath $(mandoc_path3) -ext 3 \
+		$(DOC_SOURCES)
+htmldoc: $(htmldoc_path3) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_HTML_OPTIONS) -mpath $(htmldoc_path3) \
+		$(DOC_SOURCES)
+
+install:
+	$(INSTALL_DATA) seq.h $(DESTDIR)$(includedir)/seq.h
+
+.PHONY: baseenvlib baseenvprogs clean realclean distclean dist mandoc htmldoc

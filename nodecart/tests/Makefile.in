@@ -1,0 +1,149 @@
+ALL: all-redirect
+
+# Set the basic directories
+prefix           = @prefix@
+exec_prefix      = @exec_prefix@
+datarootdir      = @datarootdir@
+libdir           = @libdir@
+abs_builddir     = @abs_builddir@
+abs_top_builddir = @abs_top_builddir@
+builddir         = @builddir@
+top_builddir     = @top_builddir@
+abs_srcdir       = @abs_srcdir@
+abs_top_srcdir   = @abs_top_srcdir@
+
+master_top_builddir = @master_top_builddir@
+master_top_srcdir   = @master_top_srcdir@
+include $(master_top_srcdir)/Makefile.doc
+
+MPICC  = @CC@
+MPIFORT = @MPIFORT@
+RANLIB  = @RANLIB@
+
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@ -I../.. -I..
+LDFLAGS = @LDFLAGS@
+COPT = @COPT@
+FCOPT = @FCOPT@
+EXTRA_LIBS = @BASEENV_LIB@ @LIBS@
+
+MKDIR_P = @MKDIR_P@
+DOCTEXT = @DOCTEXT@
+
+GENERATEDFILES =
+
+.SUFFIXES:
+.SUFFIXES: .f .f90 .c .o
+.c.o:
+	$(MPICC) -c $(CFLAGS) $(CPPFLAGS) $(COPT) $<
+.f.o:   $?
+	$(MPIFORT) $(FFLAGS) $(FCOPT) -c $(?) -o $(@)
+.f90.o: $?
+	$(MPIFORT) $(FFLAGS) $(FCOPT) -c $(?) -o $(@)
+
+
+ncarttest_SOURCES   = ncarttest.c
+ncarttest_OBJECTS   = $(ncarttest_SOURCES:.c=.o)
+ncarttest_EXTRALIBS =
+ncartperf_SOURCES   = ncartperf.c
+ncartperf_OBJECTS   = $(ncartperf_SOURCES:.c=.o)
+ncartperf_EXTRALIBS =
+layout_SOURCES      = layout.c
+layout_OBJECTS      = $(layout_SOURCES:.c=.o)
+shimtest_SOURCES    = shimtest.c
+shimtest_OBJECTS    = $(shimtest_SOURCES:.c=.o)
+shimtest_EXTRALIBS  = ../ncartshim.o
+shimtestf_SOURCES   = shimtestf.f90
+shimtestf_OBJECTS   = $(shimtestf_SOURCES:.f90=.o)
+shimtestf_EXTRALIBS = ../ncartshimf.o
+hdecomp_SOURCES     = hdecomp.c
+hdecomp_OBJECTS     = $(hdecomp_SOURCES:.c=.o)
+
+# Include the Fortran interface in the sources
+SOURCES      = $(ncarttest_SOURCES) $(ncartperf_SOURCES) \
+	$(layout_SOURCES) $(shimtest_SOURCES) $(shimtestf_SOURCES) \
+	$(hdecomp_SOURCES)
+HEADER_FILES =
+DIST_COMMON  = Makefile.in
+DOC_FILES    = README
+DOC_SOURCES  =
+SUBDIRS      =
+
+
+EXECS        = ncartperf shimtest hdecomp layout ncarttest
+OTHEREXECS   = shimtestf
+BASEENV_LIB  = @BASEENV_LIB@
+BASEENVF_LIB = @BASEENVF_LIB@
+
+all-redirect: $(EXECS)
+
+baseenvprogs: $(EXECS)
+# We use sleep to keep make from making incorrect decisions about whether
+# the library is up-to-date in some succeeding step
+$(BASEENV_LIB):
+$(BASEENVF_LIB):
+baseenvlib: $(BASEENV_LIB)
+baseenvlibf: $(BASEENVF_LIB)
+shims:
+
+Makefile: Makefile.in ../../config.status
+	(cd ../.. && ./config.status --file=nodecart/tests/Makefile)
+../../config.status: ../../configure.ac
+	(cd ../.. && ./autogen.sh)
+
+layout: $(layout_OBJECTS) ../../baseenv.h $(BASEENV_LIB)
+	$(MPICC) $(CFLAGS) $(COPT) $(CPPFLAGS) -o layout \
+		$(layout_OBJECTS) $(LDFLAGS) $(layout_EXTRALIBS) $(EXTRA_LIBS)
+
+ncartperf: $(ncartperf_OBJECTS) $(ncartperf_HEADERS) \
+		../../baseenv.h $(BASEENV_LIB)
+	$(MPICC) $(CFLAGS) $(COPT) $(CPPFLAGS) -o ncartperf \
+		$(ncartperf_OBJECTS) $(LDFLAGS) $(ncartperf_EXTRALIBS) $(EXTRA_LIBS)
+
+ncarttest: $(ncarttest_OBJECTS) $(ncarttest_HEADERS) \
+		../../baseenv.h $(BASEENV_LIB)
+	$(MPICC) $(CFLAGS) $(COPT) $(CPPFLAGS) -o ncarttest \
+		$(ncarttest_OBJECTS) $(LDFLAGS) $(ncarttest_EXTRALIBS) $(EXTRA_LIBS)
+
+# Define PRIVATE as null to allow internal routines to be visible
+hdecomp: hdecomp.c ../nodecart.c ../nodesockets.c ../nodecart.h
+	$(MPICC) $(CFLAGS) $(CPPFLAGS) -DPRIVATE= -o hdecomp  hdecomp.c \
+		../nodecart.c ../nodesockets.c
+
+shimtest: $(shimtest_OBJECTS) $(BASEENV_LIB)
+	$(MPICC) $(CFLAGS) $(COPT) $(CPPFLAGS) -o shimtest \
+		$(shimtest_OBJECTS) $(shimtest_EXTRALIBS) $(LDFLAGS) \
+		$(BASEENV_LIB)
+
+shimtestf: $(shimtestf_OBJECTS) $(BASEENV_LIB) $(BASEENVF_LIB)
+	$(MPIFORT) $(FFLAGS) $(FOPT) -o shimtestf \
+		$(shimtestf_OBJECTS) $(shimtestf_EXTRALIBS) $(LDFLAGS) \
+		$(BASEENVF_LIB) $(BASEENV_LIB)
+
+clean:
+	rm -f *.o *~
+
+realclean: clean
+	rm -f $(EXECS) $(OTHEREXECS)
+
+distclean: realclean
+	rm -f $(GENERATEDFILES) *.a
+
+dist:
+	@if [ "X$(distdir)" == "X" ] ; then echo "Set distdir" ; exit 1 ; fi
+	@if [ ! -d $(distdir) ] ; then mkdir $(distdir) ; fi
+	cp $(SOURCES) $(distdir)
+	if [ "X$(HEADER_FILES)" != "X" ] ; then \
+		cp $(HEADER_FILES) $(distdir) ; fi
+	cp $(DIST_COMMON) $(distdir)
+	if [ "X$(DOC_FILES)" != "X" ] ; then cp $(DOC_FILES) $(distdir) ; fi
+
+# Documentation targets
+mandoc: $(mandoc_path3) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_MAN_OPTIONS) -mpath $(mandoc_path3) -ext 3 \
+		$(DOC_SOURCES)
+htmldoc: $(htmldoc_path3) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_HTML_OPTIONS) -mpath $(htmldoc_path3) \
+		$(DOC_SOURCES)
+
+.PHONY: baseenvlib baseenvprogs clean realclean distclean

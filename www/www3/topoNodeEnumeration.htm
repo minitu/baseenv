@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topoNodeEnumeration</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topoNodeEnumeration"><H1>topoNodeEnumeration</H1></A>
+Return a numbering of the nodes and the ranks of the processes on the same node 
+<H2>Synopsis</H2>
+<PRE>
+int topoNodeEnumeration(topoinfo_t *topo, int *numnodes, int *mynodenum,
+                      int *nranks, int noderanks[])
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>topo </B> <DD> Pointer to topoinfo that was returned by topoInit.
+</DL>
+<P>
+<H2>Input/Output Parameter</H2>
+<DL><DT><B>nranks </B> <DD> On input, the size of <tt>noderanks</tt>.  On output, the number of
+processes on this node (including the calling process)
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL>
+<DT><B>numnodes </B><DD>Number of nodes available
+
+<DT><B>mynodenum </B><DD>Number of the node on which this process is running
+
+<DT><B>noderanks </B><DD>Ranks, in MPI_COMM_WORLD, of processes on the same node as the
+calling process.  In the value of <tt>*nranks</tt> on input is less than the
+total number of ranks, only the first <tt>*nranks</tt> values are returned, and
+<tt>*nranks</tt> is set to the total number of ranks.
+</DL>
+<P>
+<H2>Return value</H2>
+<P>
+<H2>Notes</H2>
+</BODY></HTML>

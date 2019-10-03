@@ -1,0 +1,27 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>TextFileWriteFree</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="TextFileWriteFree"><H1>TextFileWriteFree</H1></A>
+Free all resources associated with a TextFile 
+<H2>Synopsis</H2>
+<PRE>
+int TextFileWriteFree(TextFile *fh_p)
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>fh_p </B> <DD> Pointer to a <tt>TextFile
+</tt>
+</DL>
+<P>
+<H2>Notes</H2>
+This routine should be called after <tt>TextFileWriteClose</tt>.
+<P>
+<H2>Return value</H2>
+An error code.  Currently, <tt>MPI_SUCCESS</tt> is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.
+<P>
+</BODY></HTML>

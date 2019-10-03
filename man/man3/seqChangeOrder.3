@@ -1,0 +1,48 @@
+.TH seqChangeOrder 3 "1/3/2019" " " ""
+.SH NAME
+seqChangeOrder \-  Change the order in which processes proceed through a sequential section 
+.SH SYNOPSIS
+.nf
+void seqChangeOrder( MPI_Comm comm, int prev, int next )
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B comm 
+- The communicator containing all processes for the sequential section
+.PD 1
+.PD 0
+.TP
+.B prev 
+- The rank of the previous process
+.PD 1
+.PD 0
+.TP
+.B next 
+- The rank of the next process
+.PD 1
+
+.SH NOTES
+This routine changes the order in which the processes in 
+.I comm
+proceed in
+a sequential section begun with 
+.I seqBegin
+\&.
+While not a collective routine,
+it is the users' responsibility to ensure that the specification of 
+.I prev
+and 
+.I next
+contains on cycles and all processes are reachable.
+
+The process for which 
+.I prev
+is 
+.I MPI_PROC_NULL
+goes first; the last process
+must have 
+.I MPI_PROC_NULL
+for the 
+.I next
+value.

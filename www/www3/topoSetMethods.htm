@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topoSetMethods</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topoSetMethods"><H1>topoSetMethods</H1></A>
+Set the methods used to determine the topology 
+<H2>Synopsis</H2>
+<PRE>
+int topoSetMethods(topoMethod_t nodeMethod, topoMethod_t netMethod)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>nodeMethod </B><DD>The method used to determine the topology of the node (e.g.,
+the number of cores and sockets)
+
+<DT><B>netMethod </B><DD>The method used to determine the topology connecting the
+nodes (e.g., a mesh for a Cray XE or IBM BlueGene).
+</DL>
+<P>
+<H2>Notes</H2>
+Valid methods can be discovered by calling <tt>topoAvailMethods</tt>.
+</BODY></HTML>

@@ -1,0 +1,39 @@
+To test 3D stencil exchanges,
+
+mpiexec -n 64 ./stencil
+
+<<RMA code not yet implemented >>
+After running stencil, check the performance of the RMA runs: NR-D and NR-U
+On some implementations of MPI, RMA performance, particularly with derived
+datatypes, is extremely poor.  If the performance for NR-D is poor, add
+--normadtype to the arguments.  If the performance for NR-U is poor, add
+--normacontig to the arguments.  If both are poor, use --norma .  For example,
+
+mpiexec -n 4096 ./stencil --normadtype
+
+The program stencil runs several different approaches to communication.  These
+are noted in the second column.  These are:
+
+  <Blocking | Nonblocking> <Point2point | RMA | Sharedmemory | Collective-sparse>
+     <? Overlap> <Userdata-packing | Datatype> [ <? Persistent-request> ]
+
+By default, the tests are run on MPI_COMM_WORLD and on communicators that
+are not congurent (have the same group members and ordering). By adding
+the argument --noskip , the tests will include these communicators.
+To run the tests with the sparse collectives, even if the communicator
+created by MPI_Cart_create is congruent to MPI_COMM_WORLD, add --withcart:
+
+    mpiexec -n 4096 ./stencil --normadtype --withcart
+
+Message sizes can be specified with --size range, as in
+
+
+    mpiexec -n 4096 ./stencil --size 16,32,64 --normadtype --withcart
+
+(this list of sizes is the default).
+
+Finally, the output from stencil goes to stdout by default.  Use -o filename
+to output to a file (name s4k.txt in this case):
+
+    mpiexec -n 4096 ./stencil --normadtype --withcart -o s4k.txt
+

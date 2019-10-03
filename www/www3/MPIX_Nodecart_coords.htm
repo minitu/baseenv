@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPIX_Nodecart_coords</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPIX_Nodecart_coords"><H1>MPIX_Nodecart_coords</H1></A>
+Determines process coords in Cartesian topology given rank in group 
+<H2>Synopsis</H2>
+<PRE>
+int MPIX_Nodecart_coords(MPI_Comm comm, int rank, int maxdims, int coords[])
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>comm </B><DD>communicator with Cartesian structure (handle)
+
+<DT><B>rank </B><DD>rank of a process within group of <tt>comm</tt> (integer)
+
+<DT><B>maxdims </B><DD>length of vector <tt>coords</tt> in the calling program (integer)
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL><DT><B>coords </B> <DD> integer array (of size <tt>ndims</tt>) containing the Cartesian
+coordinates of specified process (integer)
+</DL>
+*/
+int MPIX_Nodecart_coords(MPI_Comm comm, int rank, int maxdims, int coords[])
+{
+int        flag;
+nodecart_t *ninfo;
+<P>
+MPI_Comm_get_attr(comm, nodecartKeyval, &amp;ninfo, &amp;flag);
+if (!ninfo || !flag) {
+fprintf(stderr, "Unable to access attribute on comm\n");
+fflush(stderr);
+MPI_Abort(MPI_COMM_WORLD, 1 );
+}
+<P>
+rankToCoords(ninfo-&gt;ndim, ninfo-&gt;dims, rank, coords);
+<P>
+return MPI_SUCCESS;
+}
+<P>
+/*@
+MPIX_Nodecart_rank - Determines process rank in communicator given Cartesian
+location
+<P>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>comm </B><DD>communicator with Cartesian structure (handle)
+
+<DT><B>coords </B><DD>integer array (of size <tt>ndims</tt>, the number of dimensions of
+the Cartesian topology associated with <tt>comm</tt>) specifying the Cartesian
+coordinates of a process
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL><DT><B>rank </B> <DD> rank of specified process (integer)
+</DL>
+<P>
+<H2>Notes</H2>
+Out-of-range coordinates are erroneous for non-periodic dimensions.
+</BODY></HTML>

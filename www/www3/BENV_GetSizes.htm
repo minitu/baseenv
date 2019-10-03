@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>BENV_GetSizes</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="BENV_GetSizes"><H1>BENV_GetSizes</H1></A>
+Return an array of integers from the argument list 
+<H2>Synopsis</H2>
+<PRE>
+int *BENV_GetSizes(int argc, char *argv[], const char *argname, int *nsizes)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>argc </B><DD>argument count
+
+<DT><B>argname </B><DD>argument name
+</DL>
+<P>
+<H2>Input/Output Parameter</H2>
+<DL><DT><B>argv </B> <DD> argument vector on input.  If <tt>argname</tt> is found, the values
+of argv for that argument and the following argument are set to null.
+</DL>
+<P>
+<H2>Output Parameter</H2>
+<DL><DT><B>nsizes </B> <DD> number of values returned
+</DL>
+<P>
+<H2>Return value</H2>
+Pointer to an array, allocated with <tt>malloc</tt>, containing the integers
+On error, <tt>nsizes == -1</tt> and the return value is <tt>NULL</tt>.
+The user should <tt>free(ptr)</tt> where <tt>ptr</tt> is the value returned by this routine.
+<P>
+<H2>Notes</H2>
+This routine looks for a pair of arguments of the form
+<PRE>
+      ... --argname list
+</PRE>
+
+where <tt>list</tt> may be either a comma-separated list of values or a range with
+an optional stride.  Specifically,
+<PRE>
+   a,b,...,c (comma separated list)
+   a:b or a:b:c (range with additive stride)
+   a:b*c (range with multiplicative stride)
+</PRE>
+
+Here, <tt>a</tt> and <tt>b</tt> may have postfix <tt>k</tt> or <tt>K</tt> for times 1024 and <tt>m</tt> or <tt>M
+</tt>for time 1024*1024.
+<P>
+This routine sets found arguments to null to permit other routines to process
+other arguments; this requires all routines to permit a <tt>NULL</tt> argument for
+a value in <tt>argv</tt>.
+</BODY></HTML>

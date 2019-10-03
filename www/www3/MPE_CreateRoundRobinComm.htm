@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPE_CreateRoundRobinComm</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPE_CreateRoundRobinComm"><H1>MPE_CreateRoundRobinComm</H1></A>
+Create a round-robin mapped communicator for  all processes.  
+<H2>Synopsis</H2>
+<PRE>
+int MPE_CreateRoundRobinComm( MPI_Comm comm, MPI_Comm *rrcomm, int *nnodes )
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>comm </B> <DD> Communicator of processes
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL>
+<DT><B>rrcomm </B><DD>New communicator where processes are mapped in a round-robin
+fashion between nodes
+
+<DT><B>nnodes   </B><DD>My node number
+</DL>
+<P>
+</BODY></HTML>

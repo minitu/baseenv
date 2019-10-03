@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPE_CreateConseqComm</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPE_CreateConseqComm"><H1>MPE_CreateConseqComm</H1></A>
+Create a communiator for all processes where process  are consequtive on each node. 
+<H2>Synopsis</H2>
+<PRE>
+int MPE_CreateConseqComm( MPI_Comm comm, MPI_Comm *rrcomm, int *nnodes )
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>comm </B> <DD> Communicator of processes
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL>
+<DT><B>rootComm </B><DD>Communicator of processes, consequetive on each node
+
+<DT><B>nnodes   </B><DD>My node number
+</DL>
+<P>
+</BODY></HTML>

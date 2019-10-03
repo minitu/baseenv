@@ -1,0 +1,44 @@
+.TH MPIX_NodeSubset 3 "1/3/2019" " " ""
+.SH NAME
+MPIX_NodeSubset \-  Create a subset of a given communicator with a specified number of nodes 
+.SH SYNOPSIS
+.nf
+int MPIX_NodeSubset(MPI_Comm incomm, MPI_Comm leadercomm, MPI_Comm nodecomm,
+int nnodes, MPI_Comm *outcommPtr)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B incomm 
+- Communicator from which to form the subset
+.PD 1
+.PD 0
+.TP
+.B leadercomm 
+- Communicator of node leaders for 
+.I incomm
+
+.PD 1
+.PD 0
+.TP
+.B nodecomm 
+- Communicator of processes on this node
+.PD 1
+.PD 0
+.TP
+.B nnodes 
+- Number of nodes to retain in the subset
+.PD 1
+
+.SH OUTPUT PARAMETER
+.PD 0
+.TP
+.B outcommPtr 
+- Pointer to the created subset communicator.
+.PD 1
+
+.SH NOTES
+Given an incomm, with leadercomm of the nodes and nodecomm for the
+processes on the same node as the calling process, create a subset
+communicator with nnodes nodes.
+

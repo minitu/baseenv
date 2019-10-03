@@ -1,0 +1,194 @@
+# The following provide compiler-specific information about flags for
+# optimization and vectorization, organized by family
+# gcc is GNU gcc, not CLANG.  Use a COMPILER_FAMILY of clang for LLVM-bsed
+# compilers.
+
+# Use COMPILER_ARCH to select options within a compiler family.  For example
+# COMPILER_ARCH=power8 can be used to select Power8 architecture options for
+# gcc and xlc (as much as possible, the same name is used for the architecture
+# for different compilers, but some architecture values are specific to a
+# compiler)
+
+# This defines the flags:
+#  OPTFLAGS    = general flags to instruct the C compiler to optimize code
+#  NOOPTFLAGS  = as OPTFLAGS, but turn off optimizations
+#  VECFLAGS    = flags to instruct the C compiler to vectorize
+#  NOVECFLAGS  = as VECFLAGS, but turn off vectorization
+#  VECLIST     = ask the compiler to produce a report about is attempts to
+#                vectorize code
+#  VECLISTFNAME = pattern to describe output file from VECLIST (not yet
+#                 implemented)
+#  WARNFLAGS   = flags to instruct the compiler to provide more comprehensive
+#                warning messages
+#  ASMLISTOPT  = flag(s) to instruct the compiler to provide a human-readable
+#                assembly language listing
+
+# Old options:
+#   flags -> OPTFLAGS
+#   fflags -> OPTFFLAGS
+#   noopt -> NOOPTFLAGS
+
+# clang pretends to be gcc, but it isn't
+ifeq "$(COMPILER_FAMILY)" "clang"
+# CLANG
+OPTFLAGS   = -O3 -flax-vector-conversions -funsafe-math-optimizations
+WARNFLAGS  = -Wall -Werror
+#VECFLAGS   = -fivopts
+VECFLAGS   =  -msse4.2 -fvectorize -fslp-vectorize
+NOVECFLAGS = -fno-vectorize
+#VECLIST   = -ftree-vectorizer-verbose=1
+VECLIST    =
+NOOPTFLAGS = -O0
+ASMLISTOPT = -S
+endif
+
+ifeq "$(COMPILER_FAMILY)" "gcc"
+# GCC
+# -mfma may be required, particularly with gcc version 6, to get vectorization
+# in some cases.  Note that the code fails to compile on Mac OSX with
+# gcc 5.1.0 with -mfma selected, probably because of installation bugs with
+# gcc (it appears to fail to detect that the as program can't handle some of
+# the instructions that it generates).
+
+ifeq "$(COMPILER_ARCH)" "power8"
+ARCHVECOPTIONS=-mcpu=power8 -mtune=native -maltivec -mpower8-vector
+ARCHNOVECOPTIONS=-mno-altivec -mno-vsx -mno-power8-vector
+else ifeq "$(COMPILER_ARCH)" "power9"
+ARCHVECOPTIONS=-mcpu=power9 -mtune=native -maltivec -mpower8-vector
+ARCHNOVECOPTIONS=-mno-altivec -mno-vsx -mno-power8-vector
+else ifeq "$(COMPIELR_ARCH)" "avx2"
+ARCHVECOPTIONS=-march=native -mtune=native -mavx2
+else ifeq "$(COMPILER_ARCH)" "skylake"
+# GCC docs are opaque on what options are needed to enable the use of the
+# instructions - it may be that -mvax2 and -mfma are unnecessary
+ARCHVECOPTIONS=-march=skylake -mtune=skylake -mavx2 -mfma
+endif
+
+# This probably isn't correct - should be if not set, not if not defined.
+ifndef ARCHVECOPTIONS
+ARCHVECOPTIONS=-msse4.2
+endif
+
+OPTFLAGS   = -O3 -fivopts -flax-vector-conversions -funsafe-math-optimizations
+WARNFLAGS  =  -Wall -Werror
+VECFLAGS   = $(ARCHVECOPTIONS)
+NOVECFLAGS = -fno-tree-vectorize $(ARCHNOVECOPTIONS)
+VECLIST    = -ftree-vectorizer-verbose=1
+NOOPTFLAGS = -O0
+ASMLISTOPT = -S
+endif
+
+ifeq "$(COMPILER_FAMILY)" "cray"
+# craycc
+
+# For the XE6 nodes (AMD Interlagos)
+ifeq "$(COMPILER_ARCH)" "xe6"
+ARCHOPTIONS=-hcpu=interlagos-cu
+endif
+
+# FIXME: Add an NODEARCH option for other processor types
+OPTFLAGS   = -hc99 -O3 $(ARCHOPTIONS)
+VECFLAGS   = -hvector3
+NOVECFLAGS = -hvector0
+VECLIST = -hreport=vf -hlist=m
+# Fortran version (a subset of the C flags)
+OPTFFLAGS    = -O3 $(ARCHOPTIONS)
+FVECFLAGS = -hvector3
+FNOVECFLAGS = -hvector0
+FVECLIST = -hlist=m
+ASMLISTOPT =
+endif
+
+ifeq "$(COMPILER_FAMILY)" "intel"
+# icc
+# The intel compiler falsely claims to be gcc.  The defintion of HAVE_ICC
+# lets codes correctly compensate for that lie.
+OPTFLAGS = -O3 -DHAVE_ICC
+VECFLAGS = -fast -no-ipo
+VECLIST = -qopt-report=2 -qopt-report-phase=vec
+#vecflags = -xSSE4.2 -vec_report2
+NOVECFLAGS = -no-vec -no-ipo -no-simd
+NOOPTFLAGS = -O0 -DHAVE_ICC
+ASMLISTOPT =
+endif
+
+ifeq "$(COMPILER_FAMILY)" "pgi"
+# portland group
+# As of version 14.2-0, pgcc fails on routine s443.
+# Note -Minfo sends output to stderr, not to the lst file.
+# PGI also does not document any predefined macro identifying the compiler
+# Some third-party documentation suggests that __PGI is defined, but
+# since the PGI documentation doesn't disclose that, we can't count on it.
+# Thus we define our own macro to indicate PGI.
+ifeq "$(COMPILER_ARCH)" "power9"
+OPTFLAGS = -Mcache_align -DPGI_COMPILER -tp=pwr9
+VECFLAGS = -O3 -fast -Mlre -Mvect
+VECLIST = -Minfo=vect -Mlist
+else
+OPTFLAGS = -Mcache_align -DPGI_COMPILER
+VECFLAGS = -O3 -fast -Mipa=fast,inline -Mlre -Mm128 -Mvect
+VECLIST = -Minfo=vect -Mlist
+endif
+NOVECFLAGS = -O2 -Mnovect
+NOOPTFLAGS = -O0
+ASMLISTOPT =
+endif
+
+# IBM XL Compilers
+# The COMPILER_ARCH is important here.  Values include
+#     bgq, power7, power8, power9
+ifeq "$(COMPILER_FAMILY)" "xlc"
+# Other options to consider
+# -qlanglvl=stdc99
+# -qrelax or -qstrict=noieeefp
+
+ifeq "$(COMPILER_ARCH)" "bgq"
+# bgxlc complains about -qsmp requires a -qthreaded option, which is silly,
+# since (a) we're using -qsmp to turn OFF the smp optimization and (b) there
+# is no documentation on -qthreaded in -help (but the PDF does have the
+# necessary documentation)
+ARCHOPTIONS=-O4 -qarch=-qp -qtune=qp -qassert=refalign -qsmp=noauto -qnothreaded
+ARCHVECOPTIONS=-qenablevmx -qsimd=auto
+else ifeq "$(COMPILER_ARCH)" "power7"
+ARCHOPTIONS=-O3 -qarch=pwr7 -qtune=pwr7
+ARCHVECOPTIONS=-qaltivec -qenablevmx
+else ifeq "$(COMPILER_ARCH)" "power8"
+ARCHOPTIONS=-O4 -qarch=pwr8 -qtune=pwr8
+ARCHVECOPTIONS=-qaltivec
+else ifeq "$(COMPILER_ARCH)" "power9"
+ARCHOPTIONS=-O4 -qarch=pwr9 -qtune=pwr9
+ARCHVECOPTIONS=-qaltivec
+else
+ARCHOPTIONS=
+ARCHVECOPTIONS=
+endif
+
+OPTFLAGS = $(ARCHOPTIONS) -qhot -qipa=malloc16 -qdebug=NSIMDCOST -qdebug=alwaysspec -qdebug=NFUSE -qnoinline
+VECFLAGS = $(ARCHVECOPTIONS)
+VECLIST = -qreport
+NOVECFLAGS = -qnoenablevmx -qsimd=noauto
+NOOPTFLAGS = -O0
+ASMLISTOPT =
+endif
+
+# These last two (generic and blank) should be the same
+ifeq "$(COMPILER_FAMILY)" "generic"
+OPTFLAGS   = -O
+VECFLAGS   =
+VECLIST    =
+NOVECFLAGS =
+NOOPTFLAGS =
+ASMLISTOPT =
+endif
+
+ifeq "$(COMPILER_FAMILY)" ""
+OPTFLAGS   = -O
+VECFLAGS   =
+VECLIST    =
+NOVECFLAGS =
+NOOPTFLAGS =
+ASMLISTOPT =
+endif
+
+# End of compiler-family information
+# ------------------------------------------------------------------------

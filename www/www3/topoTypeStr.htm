@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topoTypeStr</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topoTypeStr"><H1>topoTypeStr</H1></A>
+Return a string name for a topology type 
+<H2>Synopsis</H2>
+<PRE>
+const char *topoTypeStr(topoType_t t)
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>t </B> <DD> A <tt>topoType_t</tt> value
+</DL>
+<P>
+<H2>Return Value</H2>
+A string name for the topology type.  On error, returns <tt>invalid topo type!
+</tt>The known names include <tt>torus</tt>, <tt>mesh</tt>, <tt>socket</tt>, and <tt>core</tt>.
+<P>
+<H2>Thread Safety</H2>
+This routine is thread safe.
+</BODY></HTML>

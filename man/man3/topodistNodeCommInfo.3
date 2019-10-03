@@ -1,0 +1,51 @@
+.TH topodistNodeCommInfo 3 "1/3/2019" " " ""
+.SH NAME
+topodistNodeCommInfo \-  Provide some information about off-node communication 
+.SH SYNOPSIS
+.nf
+int topodistNodeCommInfo(topodist_t *td, MPI_Comm comm,
+int *partnerOnNode, int *partnerOffNode,
+MPI_Comm *nodecomm_p, int *totalOffNode)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B td 
+- Topodist information returned by topodistInit
+.PD 1
+.PD 0
+.TP
+.B comm 
+- Communicator of processes to use.  This routine is collective over
+this communicator.  The most common choice of 
+.I comm
+is 
+.I MPI_COMM_WORLD
+
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B partnerOnNode 
+- Number of processes that this process communicates with
+that are on the same node
+.PD 1
+.PD 0
+.TP
+.B partnerOffNode 
+- As above, but for partners that are off node
+.PD 1
+.PD 0
+.TP
+.B nodecomm_p     
+- A communicator containing only the processes that share
+the node with the calling process.
+.PD 1
+.PD 0
+.TP
+.B totalOffNode 
+- The total number of processes on this node that are
+communicating to one or more processes on a different node
+.PD 1
+

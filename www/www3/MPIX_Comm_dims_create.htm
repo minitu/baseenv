@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPIX_Comm_dims_create</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPIX_Comm_dims_create"><H1>MPIX_Comm_dims_create</H1></A>
+Creates a division of processors within a given communicator in a Cartesian grid 
+<H2>Synopsis</H2>
+<PRE>
+int MPIX_Comm_dims_create(MPI_Comm comm, int nnodes, int ndims, int dims[])
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>comm  </B><DD>Communicator (handle)
+
+<DT><B>nnodes </B><DD>number of nodes in a grid (integer)
+
+<DT><B>ndims </B><DD>number of Cartesian dimensions (integer)
+</DL>
+<P>
+<H2>Input/Output Parameters</H2>
+<DL><DT><B>dims </B> <DD> integer array of size  <tt>ndims</tt> specifying the number of nodes in each
+dimension. All entries (for <tt>ndims</tt>) are filled in; unlike <tt>MPI_Dims_create</tt>,
+values in <tt>dims</tt> do not set the size for that dimension.
+</DL>
+<P>
+<H2>Notes</H2>
+Unlike <tt>MPI_Dims_create</tt>, this is a collective routine over <tt>comm</tt>.  This
+permits the implementation to perform collective communication operations to
+determine good decompositions.
+<P>
+</BODY></HTML>

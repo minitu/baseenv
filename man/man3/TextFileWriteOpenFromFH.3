@@ -1,0 +1,52 @@
+.TH TextFileWriteOpenFromFH 3 "4/23/2018" " " ""
+.SH NAME
+TextFileWriteOpenFromFH \-  Associate a TextFile with an open FILE handle 
+.SH SYNOPSIS
+.nf
+int TextFileWriteOpenFromFH(MPI_Comm comm, int root, FILE *fp, MPI_Info info,
+TextFile *fh_p)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B comm 
+- MPI Communicator of all processes that will perform text writes
+.PD 1
+.PD 0
+.TP
+.B root 
+- Rank of process (in 
+.I comm
+) that will perform I/O to the file
+.PD 1
+.PD 0
+.TP
+.B fp   
+- Already open for writing FILE.  A common use is with 
+.I stdout
+
+.PD 1
+.PD 0
+.TP
+.B info 
+- MPI Info object that may be used for opening the file.  Use
+.I MPI_INFO_NULL
+for no special behavior.
+.PD 1
+
+.SH OUTPUT PARAMETER
+.PD 0
+.TP
+.B fh_p 
+- Pointer to a 
+.I TextFile
+
+.PD 1
+
+.SH RETURN VALUE
+An error code.  Currently, 
+.I MPI_SUCCESS
+is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.
+

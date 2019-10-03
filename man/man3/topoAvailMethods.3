@@ -1,0 +1,54 @@
+.TH topoAvailMethods 3 "4/23/2018" " " ""
+.SH NAME
+topoAvailMethods \-  Return the available methods for determining the topology 
+.SH SYNOPSIS
+.nf
+int topoAvailMethods(int maxnum, int *nnode, int *nnet,
+topoMethod_t nodeMethod[], topoMethod_t netMethod[])
+.fi
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B maxnum 
+- Size of the arrays 
+.I nodeMethod
+and 
+.I netMethod
+
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B nnode 
+- Number of node methods defined
+.PD 1
+.PD 0
+.TP
+.B nnet 
+- Number of network methods defined
+.PD 1
+.PD 0
+.TP
+.B nodeMethod 
+- Array containing an entry for each node method
+.PD 1
+.PD 0
+.TP
+.B netMethod 
+- Array containing an entry for each network method
+.PD 1
+
+.SH NOTES
+This routine returns the available methods to determine the topology
+information within the node and between nodes (the internode network).
+Values are taken from the enum 
+.I topoMethod_t
+\&.
+The methods may be used
+in 
+.I topoSetMethods
+to specify how the topology is determined when 
+.I topoInit
+is called.
+

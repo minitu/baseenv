@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>stencil</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="stencil"><H1>stencil</H1></A>
+Measure the performance of different halo-exchange approaches in MPI for a regular stencil code 
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>nrange </B><DD>Range of problem sizes.  See below
+
+<DT><B>energy </B><DD>Amount of energy to input into the simulation
+
+<DT><B>niters </B><DD>Number of iterations to perform
+
+<DT><B>px </B><DD>Number of processes in the x-direction
+
+<DT><B>py </B><DD>Number of processes in the y-direction
+
+<DT><B>filename </B><DD>Name of output file (stdout if not provided)
+</DL>
+<P>
+<H2>Output Results</H2>
+The output is printed as a tab-separated table, indicating the
+time for the different operations and halo-exchange choices, as well as an
+achieved computation rate.  The default output is to stdout, but can be
+changed with a commandline argument.
+<P>
+<H2>Notes</H2>
+The <tt>nrange</tt> parameter provides the size of a size of the mesh, and may
+be either a single value, a comma-separated list, or a range in the form
+<tt>start:end:increment</tt>.
+<P>
+The program should be compiled with optimization and with vectorization
+enabled if the computation rates are to be used.  Note that the computation
+code does not compute the heat per iteration unless the code is compiled
+with <tt>-DCOMPUTE_HEAT_EACH_ITERATION=1</tt>.  Including this code causes the
+Cray compiler (at least) to fail to vectorize the application of the stencil
+in the same loop, causing a significant loss in performance.
+</BODY></HTML>

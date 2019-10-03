@@ -1,0 +1,60 @@
+Installation notes
+
+Configuration Step
+==================
+For the most common use, just do
+
+./configure
+
+If the MPI compilation scripts are not mpicc or mpicc, or they are not
+in the path, provide them using MPICC and MPIFORT, as in
+
+./configure MPICC=mpxlc MPIFORT=mpxlf
+
+If the C compiler can be used for both C and MPI programs, as is the
+case for the Cray XE6/XK7, use
+
+./configure CC=cc FC=fort
+
+By default, this package builds only some of the components.  Use the
+appropriate "with" arguments to control which components are built.
+For example, to build fpmpi2, add --with-fpmpi2
+
+Some of the I/O tests need to know a directory in the high performance
+(hopefully parallel) file system.  Use the variable MYSCRATCHDIR to
+set this (by default, this is set to the current directory, "."), as in
+
+./configure MYSCRATCHDIR=/u/fast/me/testdir
+
+Specific Systems:
+
+UIUC Blue Waters:
+The choice of compilers will depend on what modules you have loaded.
+With the default setup, the following may work:
+
+./configure CC=cc FC=ftn COPT=-O3 FCOPT=-O3
+
+ANL Theta (Intel KNL)
+
+./configure --host=x86_64-unknown-linux-gnu MPICC=cc MPIFORT=ftn
+
+Build Step
+==========
+A simple
+
+   make
+
+is sufficient to build the package.  However, two important options are the
+COMPILER_FAMILY and COMPILER_ARCH.  COMPILER_FAMILY is the compiler that
+is used; known compilers include gcc, clang, cray, intel, pgi, and xlc.
+COMPILER_ARCH is the system architecture as needed by the compiler.  For
+example, for Blue Waters,
+
+   make COMPILER_FAMILY=cray COMPILER_ARCH=xe6
+
+For Blue Gene/Q
+
+   make COMPILER_FAMILY=xlc COMPILER_ARCH=bgq
+
+These options enable vectorization of the compute-intensive benchmarks and
+examples.

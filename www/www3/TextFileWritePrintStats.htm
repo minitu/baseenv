@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>TextFileWritePrintStats</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="TextFileWritePrintStats"><H1>TextFileWritePrintStats</H1></A>
+Print performance statistics about a TextFile 
+<H2>Synopsis</H2>
+<PRE>
+int TextFileWritePrintStats(TextFile fh, FILE *fp)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>fh </B><DD>TextFile for which statistics should be printed
+
+<DT><B>fp </B><DD>File handle for output (stdout is common)
+</DL>
+<P>
+<H2>Notes</H2>
+This routine is collective (it computes some min and max values over all
+processes in fh).  It makes no attempt to order the output; use
+TextFileWriteGetStats to access and control the output of this performance
+data.
+<P>
+<H2>Return value</H2>
+An error code.  Currently, <tt>MPI_SUCCESS</tt> is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.
+</BODY></HTML>

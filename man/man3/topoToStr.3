@@ -1,0 +1,39 @@
+.TH topoToStr 3 "4/23/2018" " " ""
+.SH NAME
+topoToStr \-  Create a one-line description of the topology, suitable for printing 
+.SH SYNOPSIS
+.nf
+int topoToStr(topoinfo_t *topo, int incname, char *str, int len)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B topo 
+- Pointer to topology information
+.PD 1
+.PD 0
+.TP
+.B incname 
+- if true, include the string name of each element of the topology
+.PD 1
+.PD 0
+.TP
+.B len 
+- size of 
+.I str
+
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B str 
+- Pointer to a 
+.I char
+array that will contain the description of the
+topology.
+.PD 1
+
+.SH RETURN VALUE
+0 on success, non-zero on failure.
+

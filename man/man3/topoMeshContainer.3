@@ -1,0 +1,62 @@
+.TH topoMeshContainer 3 "4/23/2018" " " ""
+.SH NAME
+topoMeshContainer \-  If the topology contains a mesh or torus, return the minimum and maximum dimensions of the n-d section that contains all processes 
+.SH SYNOPSIS
+.nf
+int topoMeshContainer(topoinfo_t *topo, int *ndim,
+int mindim[], int maxdim[], int qtorus[])
+.fi
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B topo 
+- Pointer to topology information
+.PD 1
+
+.SH INPUT/OUTPUT PARAMETER
+.PD 0
+.TP
+.B ndim 
+- Pointer to dimension of mesh or torus.  On input, the size of the
+arrays 
+.I mindim
+, 
+.I maxdim
+, and 
+.I qtorus
+\&.
+On output, the size of the
+mesh or torus.
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B mindim 
+- The minimum coordinates of any process in the mesh or torus.
+.PD 1
+.PD 0
+.TP
+.B maxdim 
+- The maximum coordinates of any process in the mesh or torus.
+.PD 1
+.PD 0
+.TP
+.B qtorus 
+- 1 if this dimension is periodic, 0 otherwise.
+.PD 1
+
+.SH RETURN VALUE
+0 on success (a mesh topology element was found and the data returned).
+Nonzero (currently 
+.I 1
+) on failure, and 
+.I -1
+if the topology does not
+contain a mesh or torus.
+
+.SH NOTES
+The current implementation does not indicate whether any particular dimension
+is periodic, only whether the entire multidimensional mesh is periodic.
+In addition, a subset of a torus is still returned as a torus even though the
+min and max coordinates in this dimension are not connected directly together.

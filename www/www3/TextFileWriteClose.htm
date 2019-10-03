@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>TextFileWriteClose</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="TextFileWriteClose"><H1>TextFileWriteClose</H1></A>
+Close a TextFile 
+<H2>Synopsis</H2>
+<PRE>
+int TextFileWriteClose(TextFile fh)
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>fh </B> <DD> TextFile handle previously opened
+</DL>
+<P>
+<H2>Notes</H2>
+In the case where the <tt>TextFile</tt> was opened from an existing file handle,
+this routine does <em>not</em> close the file associated with the handle.  However,
+this routine should still be called to ensure that any other operations
+needed to close the <tt>TextFile</tt> are completed.
+<P>
+<H2>Return value</H2>
+An error code.  Currently, <tt>MPI_SUCCESS</tt> is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.
+</BODY></HTML>

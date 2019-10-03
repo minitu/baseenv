@@ -1,0 +1,29 @@
+Halo Communication Benchmarks
+
+halocompare
+===========
+This program implements a simple communication exchange similar to a "halo" or
+"ghostcell" exchange.  Only contiguous data is sent, so this test only measures
+the performance of sending data between processes.  The overhead of packing
+non-contiguous data is not included in this program (but see packfunc).
+In addition, it runs a test where only one process sends and the partner
+processes receive; other processes wait in a barrier.
+
+nodecomm
+========
+This program performs communication between two "nodes" (usually nodes on an
+interconnect, but can be chips on a single node), using 1 core on each node up
+to the number of cores on the node.  This provides a measurement of how well
+the nodes can support concurrent communication along the same communication
+path.  That is a logical communication path; the code attempts to find the
+closest node, but this depends on the accuracy of the topology information;
+in addition, some systems will adaptively route data over different links
+if there is congestion, so this can provide optimistic results if since the
+other nodes are waiting in barriers.
+
+If run in the mode that measures communication/computation overlap, make sure
+that the MPI implementation is told to implement that overlap.  For example,
+on a Cray XE6, set these two environment variables:
+
+export MPICH_MAX_THREAD_SAFETY=multiple
+export MPICH_NEMESIS_ASYNC_PROGRESS=SC

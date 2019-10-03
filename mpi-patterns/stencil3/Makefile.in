@@ -1,0 +1,110 @@
+ALL: all-redirect
+
+# Set the basic directories
+prefix           = @prefix@
+exec_prefix      = @exec_prefix@
+datarootdir      = @datarootdir@
+libdir           = @libdir@
+abs_builddir     = @abs_builddir@
+abs_top_builddir = @abs_top_builddir@
+builddir         = @builddir@
+top_builddir     = @top_builddir@
+abs_srcdir       = @abs_srcdir@
+abs_top_srcdir   = @abs_top_srcdir@
+
+master_top_builddir = @master_top_builddir@
+master_top_srcdir   = @master_top_srcdir@
+include $(master_top_srcdir)/Makefile.doc
+
+MPICC  = @CC@
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@ -DUSE_ROW_MAJOR -I../.. @TOPOINC@
+LDFLAGS = @LDFLAGS@
+COPT = @COPT@
+FCOPT = @FCOPT@
+EXTRA_LIBS = @BASEENV_LIB@ @LIBS@ @HWLOCLIB@
+
+MKDIR_P = @MKDIR_P@
+DOCTEXT = @DOCTEXT@
+
+# Makefile.vec contains the options to select vectorization by the compiler.
+include $(master_top_srcdir)/Makefile.vec
+
+# For some Cray systems (known for XE6, cray-mpich/7.3.0), RMA performance
+# will be terrible unless the code is linked with
+#-Wl,--whole-archive,-ldmapp,--no-whole-archive
+# and run with the environment variable MPICH_RMA_OVER_DMAPP=1
+# (-ldmapp will not work on linking)
+
+GENERATEDFILES =
+
+.SUFFIXES:
+.SUFFIXES: .c .o
+.c.o:
+	$(MPICC) -c $(CFLAGS) $(CPPFLAGS) $(COPT) $(VECFLAGS) $(VECLIST) $<
+
+stencil_HEADERS = stencil.h
+stencil_SOURCES = stencil.c stencil_util.c
+stencil_OBJECTS = $(stencil_SOURCES:.c=.o)
+stencil_EXTRALIBS = -lm
+
+SOURCES      = $(stencil_SOURCES) $(HALO_METHODS)
+HEADER_FILES = $(stencil_HEADERS)
+DIST_COMMON  = Makefile.in
+DOC_FILES    = README
+DOC_SOURCES  = stencil.c
+
+
+EXECS = stencil
+all-redirect: $(EXECS)
+
+baseenvprogs: $(EXECS)
+baseenvlib:
+
+Makefile: Makefile.in ../../config.status
+	(cd ../.. && ./config.status --file=mpi-patterns/stencil3/Makefile)
+../../config.status: ../../configure.ac
+	(cd ../.. && ./autogen.sh)
+
+# Likely values: stencil_nb, stencil_nb_ddt, stencil_rma_ddt
+HALO_METHODS = stencil_nb.c stencil_bnb.c
+#HALO_METHODS = stencil_nb.c stencil_ddt.c stencil_ddt_ov.c stencil_ddt_rma.c \
+#	stencil_shmem_nb.c stencil_bnb.c stencil_neighcolls.c \
+#	stencil_neighcolls_ov.c stencil_pnb.c stencil_rma.c
+HALO_METHODS_OBJS = $(HALO_METHODS:.c=.o)
+
+$(HALO_METHODS_OBJS): stencil.h
+
+stencil: $(stencil_OBJECTS) $(stencil_HEADERS) $(HALO_METHODS_OBJS) \
+	../../baseenv.h
+	$(MPICC) $(CFLAGS) $(COPT) $(CPPFLAGS) -o stencil $(stencil_OBJECTS) \
+		$(HALO_METHODS_OBJS) $(LDFLAGS) $(stencil_EXTRALIBS) $(EXTRA_LIBS)
+
+clean:
+	rm -f *.o *~
+
+realclean: clean
+	rm -f $(EXECS) rma-test
+
+distclean: realclean
+	rm -f config.log config.status $(GENERATEDFILES) *.a
+	rm -rf autom4te.cache
+	rm -f heat*.svg
+
+dist:
+	@if [ "X$(distdir)" == "X" ] ; then echo "Set distdir" ; exit 1 ; fi
+	@if [ ! -d $(distdir) ] ; then mkdir $(distdir) ; fi
+	cp $(SOURCES) $(distdir)
+	cp $(HEADER_FILES) $(distdir)
+	cp $(DIST_COMMON) $(distdir)
+	if [ "X$(DOC_FILES)" != "X" ] ; then cp $(DOC_FILES) $(distdir) ; fi
+
+# Documentation targets
+mandoc: $(mandoc_path1) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_MAN_OPTIONS) -mpath $(mandoc_path1) -ext 1 \
+		$(DOC_SOURCES)
+htmldoc: $(htmldoc_path1) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_HTML_OPTIONS) -mpath $(htmldoc_path1) \
+		$(DOC_SOURCES)
+
+.PHONY: baseenvlib baseenvprogs clean realclean distclean

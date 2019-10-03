@@ -1,0 +1,23 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>seqBegin</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="seqBegin"><H1>seqBegin</H1></A>
+Begin a sequential section 
+<H2>Synopsis</H2>
+<PRE>
+void seqBegin( MPI_Comm comm )
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>comm </B> <DD> Communicator of all processes involved in sequential section
+</DL>
+<P>
+<H2>Notes</H2>
+This routine is collective over the <tt>comm</tt>; only one process at a time
+executes the code between the call to this routine and to <tt>seqEnd</tt>;
+the others wait.  The processes execute in rank order (in <tt>comm</tt>)
+<P>
+</BODY></HTML>

@@ -1,0 +1,103 @@
+mpptest - test individual communication speeds
+Test a single communication link by various methods.  The tests are 
+combinations of
+  Protocol: 
+  -sync        Blocking sends/receives    (default)
+  -async       NonBlocking sends/receives
+  -force       Ready-receiver (with a null message)
+  -persistant  Persistant communication (only with MPI)
+
+  Message data:
+  -cachesize n Perform test so that cached data is NOT reused
+
+  Message pattern:
+  -roundtrip   Roundtrip messages         (default)
+  -head        Head-to-head messages
+  -halo	       Halo Exchange (multiple head-to-head; limited options)
+    
+  Message test type:
+  (if not specified, only communication tests run)
+  -overlap     Overlap computation with communication (see -size)
+  -overlapmsgsize nn
+               Size of messages to overlap with is nn bytes.
+  -bisect      Bisection test (all processes participate)
+  -bisectdist n Distance between processes
+    
+  Message test options:
+  -pending     A pending receive is posted before the tests
+  -specified   A specified source rather than MPI_ANY_SOURCE is used
+               for the source field in receive calls.
+
+  Message sizes:
+  -size start end stride                  (default 0 1024 32)
+               Messages of length (start + i*stride) for i=0,1,... until
+               the length is greater than end.
+  -sizelist n1,n2,...
+               Messages of length n1, n2, etc are used.  This overrides 
+               -size
+  -auto        Compute message sizes automatically (to create a smooth
+               graph.  Use -size values for lower and upper range
+  -autodx n    Minimum number of bytes between samples when using -auto
+  -autorel d   Relative error tolerance when using -auto (0.02 by default)
+  -autodebug   Provide debugging information on the -auto option
+
+  Number of tests
+  -reps n      Number of times message is sent (default 1000)
+  -autoreps    Compute the number of times a message is sent automatically
+  -tgoal  d    Time that each test should take, in seconds.  Use with 
+               -autoreps
+  -rthresh d   Fractional threshold used to determine when minimum time
+               has been found.  The default is 0.05.
+  -sample_reps n   Number of times a full test is run inorder to find the
+               minimum average time.  The default is 30
+
+  -gop [ options ]:
+
+Collective Tests:
+-dsum     : reduction (double precision)
+-isum     : reduction (integer)
+-sync     : synchronization
+-colx     : collect with known sizes
+-colxex   : collect with known sizes with exchange alg.
+-scatter  : scatter
+-bcast    : another name for -scatter
+
+Collective test control:
+-pset n-m            : processor set consisting of nodes n to m
+Collective communication algorithms:
+-rr n   : use a ready-receiver version for messages n bytes or longer
+          (many operations do not yet have rr versions)
+-ring   : use a ring algorithm
+-tree   : use a tree algorithm
+-line   : use a linear algorithm
+
+Options for collective algorithms
+-pkt len stride cnt : use packets of length len
+-fast               : use a (possibly) contention-free tree
+
+Output
+  -cit         Generate data for CIt (default)
+  -gnuplot     Generate data for GNUPLOT
+  -givedy      Give the range of data measurements
+  -fname filename             (default is stdout)
+               (opened for append, not truncated)
+  -noinfo      Do not generate plotter command lines or rate estimate
+  -wx i n      windows in x, my # and total #
+  -wy i n      windows in y, my # and total #
+  -lastwindow  generate the wait/new page (always for 1 window)
+  -diagnostics Provide information on the test history, specifically how many
+               tests were rejected because they were less that 1% of MPI_Wtick
+               and how many were re-run because they failed the smoothness
+               test with their neighbors.
+
+Pattern (Neighbor) choices:
+  -nbrring  - neighbors are +/- distance
+  -nbrdbl   - neighbors are +/- 2**distance
+  -nbrhc    - neighbors are hypercube
+  -nbrshift - neighbors are + distance (wrapped)
+
+Environment Variables:
+If MPPTEST_THREAD_MULTIPLE is set to any value, mpptest will use
+MPI_Init_thread() with a requested thread level of MPI_THREAD_MULTIPLE.  
+Otherwise, MPI_THREAD_SINGLE is used (or MPI_Init, if the MPI implementation
+does not support MPI_Init_thread).

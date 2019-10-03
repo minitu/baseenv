@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>spmv-c</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="spmv-c"><H1>spmv-c</H1></A>
+Report the performance of an example sparse matrix-vector multiply 
+<H2>Input parameter</H2>
+<DL><DT><B>n </B> <DD> The mesh size for the matrix.  The number of rows in the matrix is
+n*n
+</DL>
+<P>
+<H2>Notes</H2>
+This routine is an example of sparse matrix-vector multiply, using
+CSR (compressed sparse row format).  Because this code is in C, the
+index values in the <tt>ia</tt> and <tt>ja</tt> arrays are zero origin rather than one
+origin as they would be in Fortran.
+<P>
+While this code does time the sparse matrix-vector product,
+these timings are too simple to be used for serious analysis.
+<P>
+</BODY></HTML>

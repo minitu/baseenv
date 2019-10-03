@@ -1,0 +1,41 @@
+#
+# This file is included by the baseenv Makefiles to provide the documentation
+# support
+
+htmldoc_path  = $(master_top_builddir)/www
+htmldoc_path1 = $(htmldoc_path)/www1
+htmldoc_path3 = $(htmldoc_path)/www3
+mandoc_path   = $(master_top_builddir)/man
+mandoc_path1  = $(mandoc_path)/man1
+mandoc_path3  = $(mandoc_path)/man3
+
+htmldoc_root  = "--your-url-here--"
+
+DOCTEXT_HTML_OPTIONS =-html -ext htm -quotefmt -index $(htmldoc_path)/baseenv.cit -indexdir $(htmldoc_path) -nolocation
+DOCTEXT_MAN_OPTIONS  =-man -quotefmt -nolocation
+
+#
+# mandoc: $(mandoc_path3) $(DOC_SOURCES)
+# 	$(DOCTEXT) $(DOCTEXT_MAN_OPTIONS) -mpath $(mandoc_path3) -ext 3 \
+# 		$(DOC_SOURCES)
+# htmldoc: $(htmldoc_path3) $(DOC_SOURCES)
+# 	$(DOCTEXT) $(DOCTEXT_HTML_OPTIONS) \
+# 		-mpath $(htmldoc_path3) $(DOC_SOURCES)
+
+# Ensure that the directories exist (why not have make do this?)
+$(mandoc_path1):
+	$(MKDIR_P) $(mandoc_path1)
+$(mandoc_path3):
+	$(MKDIR_P) $(mandoc_path3)
+$(htmldoc_path1):
+	$(MKDIR_P) $(htmldoc_path1)
+$(htmldoc_path3):
+	$(MKDIR_P) $(htmldoc_path3)
+
+# mandocdir:
+# 	test -d $(mandoc_path1) || $(MKDIR_P) $(mandoc_path1)
+# 	test -d $(mandoc_path3) || $(MKDIR_P) $(mandoc_path3)
+# htmldocdir:
+# 	test -d $(top_builddir)/www/www1 || $(MKDIR_P) $(top_builddir)/www/www1
+# 	test -d $(top_builddir)/www/www3 || $(MKDIR_P) $(top_builddir)/www/www3
+

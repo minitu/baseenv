@@ -1,0 +1,64 @@
+.TH MPIX_Nodecart_create 3 "1/3/2019" " " ""
+.SH NAME
+MPIX_Nodecart_create \-  Create a Cartesian communicator, using information about which nodes are on the same process. 
+.SH SYNOPSIS
+.nf
+int MPIX_Nodecart_create(MPI_Comm comm_old, int ndims, const int dims[],
+const int periods[], int reorder, MPI_Comm *comm_cart)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B comm_old 
+- input communicator (handle)
+.PD 1
+.PD 0
+.TP
+.B ndims 
+- number of dimensions of Cartesian grid (integer)
+.PD 1
+.PD 0
+.TP
+.B dims 
+- integer array of size ndims specifying the number of processes in
+each dimension
+.PD 1
+.PD 0
+.TP
+.B periods 
+- logical array of size ndims specifying whether the grid is
+periodic (true) or not (false) in each dimension
+.PD 1
+.PD 0
+.TP
+.B reorder 
+- ranking may be reordered (true) or not (false) (logical)
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B comm_cart 
+- communicator with new Cartesian topology (handle)
+.PD 1
+
+.SH NOTES
+Like 
+.I MPI_Cart_create
+, the values for dims must be provided on input.
+An option to consider is to allow zero values for elements of dims,
+and then let this routine choose the dimensions to best fit the underlying
+physical hardware.
+
+The routine 
+.I MPIX_Comm_dims_create
+may be used to determine good values
+for 
+.I dims
+\&.
+
+
+The control variable 
+.I cvar_nodecart_verbose
+may be set to a positive value
+to cause output to be generated about this routine's operation.

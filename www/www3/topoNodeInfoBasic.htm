@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topoNodeInfoBasic</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topoNodeInfoBasic"><H1>topoNodeInfoBasic</H1></A>
+Return very basic information on the node 
+<H2>Synopsis</H2>
+<PRE>
+int topoNodeInfoBasic(topoinfo_t *topo, int *corenum, int *socketnum,
+                     int *corespersocket, int *socketspernode)
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>topo </B> <DD> Pointer to topoinfo that was returned by topoInit.
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL>
+<DT><B>corenum </B><DD>Points to the core number on the node.  -1 if unknown.
+
+<DT><B>socketnum </B><DD>Points to the socket (chip) number on the node.  -1 if unknown.
+
+<DT><B>corespersocket </B><DD>Number of cores (defined by the system) per socket (chip).
+-1 if unknown.
+
+<DT><B>socketspernode </B><DD>Number of sockets (processor chips) per node.  -1 if unknown.
+</DL>
+<P>
+<H2>Return value</H2>
+Zero on success and non-zero on failure
+</BODY></HTML>

@@ -1,0 +1,136 @@
+ALL: all-redirect
+
+# Set the basic directories
+prefix           = @prefix@
+exec_prefix      = @exec_prefix@
+datarootdir      = @datarootdir@
+abs_builddir     = @abs_builddir@
+abs_top_builddir = @abs_top_builddir@
+builddir         = @builddir@
+top_builddir     = @top_builddir@
+abs_srcdir       = @abs_srcdir@
+abs_top_srcdir   = @abs_top_srcdir@
+
+includedir       = @includedir@
+libdir           = @libdir@
+bindir           = @bindir@
+
+master_top_builddir = @master_top_builddir@
+master_top_srcdir   = @master_top_srcdir@
+include $(master_top_srcdir)/Makefile.doc
+include $(master_top_srcdir)/Makefile.vec
+
+MPICC    = @MPICC@
+MPIFC    = @MPIFORT@
+LIBS     = @BASEENV_LIB@ @LIBS@
+CPPFLAGS = @CPPFLAGS@
+CFLAGS   = @CFLAGS@
+# Use COPT abd FCOPT for performance optimizing options
+COPT     = @COPT@
+FCOPT    = @FCOPT@
+
+MKDIR_P         = @MKDIR_P@
+INSTALL         = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA    = @INSTALL_DATA@
+DOCTEXT         = @DOCTEXT@
+
+EXECS = mpptest goptest stress mstream mspmv blksweep buflimit winoverhead
+extra_SOURCES = gopf.c grph.c ovlap.c pair.c pattern.c getopts.c rate.c copy.c
+mpptest_SOURCES = mpptest.c $(extra_SOURCES) halo.c
+mpptest_OBJECTS = $(mpptest_SOURCES:.c=.o)
+stress_SOURCES = stress.c daytime.c getopts.c
+stress_OBJECTS = $(stress_SOURCES:.c=.o)
+goptest_SOURCES = goptest.c $(extra_SOURCES)
+goptest_OBJECTS = $(goptest_SOURCES:.c=.o)
+mstream_SOURCES = mstream.c mstreamd.c
+mstream_OBJECTS = $(mstream_SOURCES:.c=.o)
+mspmv_SOURCES = mspmv.c mspmvd.c
+mspmv_OBJECTS = $(mspmv_SOURCES:.c=.o)
+blksweep_SOURCES = blksweep.f90 blksweepd.f90
+blksweep_OBJECTS = blksweep.o blksweepd.o ../nodeperf/mysecond.o
+winoverhead_SOURCES = winoverhead.c
+winoverhead_OBJECTS = $(winoverhead_SOURCES:.c=.o)
+buflimit_SOURCES = buflimit.c
+buflimit_OBJECTS = $(buflimit_SOURCES:.c=.o)
+
+# Describe the files needed for the distribution
+SOURCES      = $(mpptest_SOURCES) stress.c daytime.c $(mstream_SOURCES) \
+	$(mspmv_SOURCES) $(blksweep_SOURCES) goptest.c $(winoverhead_SOURCES) \
+	$(buflimit_SOURCES)
+DIST_COMMON  = configure.ac configure aclocal.m4 Makefile.in mpptestconf.h.in
+DOC_FILES    = README mpptest.hlp goptest.hlp stress.hlp
+HEADER_FILES = mpptest.h getopts.h
+
+.SUFFIXES:
+.SUFFIXES: .f90 .c .o
+.PHONY: clean realclean distclean all-redirect baseenvlib baseenvprogs
+
+all-redirect: $(EXECS)
+
+baseenvprogs: $(EXECS)
+baseenvlib:
+
+mpptest: $(mpptest_OBJECTS)
+	$(MPICC) -o mpptest $(mpptest_OBJECTS) $(LIBS)
+goptest: $(goptest_OBJECTS)
+	$(MPICC) -o goptest $(goptest_OBJECTS) $(LIBS)
+stress: $(stress_OBJECTS)
+	$(MPICC) -o stress $(stress_OBJECTS) $(LIBS)
+mstream: $(mstream_OBJECTS)
+	$(MPICC) -o mstream $(mstream_OBJECTS) $(LIBS)
+mspmv: $(mspmv_OBJECTS)
+	$(MPICC) -o mspmv $(mspmv_OBJECTS) $(LIBS)
+blksweep: $(blksweep_OBJECTS)
+	$(MPIFC) -o blksweep $(blksweep_OBJECTS) $(LIBS)
+winoverhead: $(winoverhead_OBJECTS)
+	$(MPICC) -o winoverhead $(winoverhead_OBJECTS) $(LIBS)
+buflimit: $(buflimit_OBJECTS)
+	$(MPICC) -o buflimit $(buflimit_OBJECTS) $(LIBS)
+
+# Ensure that this is compiled with vector optimization enabled
+blksweep.o: blksweep.f90
+	$(MPIFC) $(FCFLAGS) $(FCOPT) $(FVECFLAGS) $(FVECLIST) -c blksweep.f90
+
+# Default rules to force use of the MPI compilers
+.c.o:
+	$(MPICC) $(CFLAGS) $(CPPFLAGS) $(COPT) -c $< -o $@
+.f90.o:
+	$(MPIFC) $(FCFLAGS) $(FCOPT) -c $< -o $@
+
+# Add the header files as dependencies
+$(mpptest_OBJECTS): mpptest.h mpptestconf.h
+$(buflimit_OBJECTS): mpptestconf.h
+
+clean:
+	rm -f *.o *.gpl *.dat
+
+realclean: clean
+	rm -f $(EXECS)
+
+distclean: realclean
+	rm -f config.log config.status
+	rm -rf autom4te.cache
+
+dist: clean
+	@if [ "X$(distdir)" == "X" ] ; then echo "Set distdir" ; exit 1 ; fi
+	@if [ ! -d $(distdir) ] ; then mkdir $(distdir) ; fi
+	cp $(SOURCES) $(distdir)
+	cp $(HEADER_FILES) $(distdir)
+	cp $(DIST_COMMON) $(distdir)
+	cp $(DOC_FILES) $(distdir)
+
+# Documentation targets
+mandoc: $(mandoc_path1) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_MAN_OPTIONS) -mpath $(mandoc_path1) -ext 1 \
+		$(DOC_SOURCES)
+htmldoc: $(htmldoc_path1) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_HTML_OPTIONS) -mpath $(htmldoc_path1) \
+		$(DOC_SOURCES)
+
+install:
+	for program in $(EXECS) ; do \
+	    $(INSTALL_PROGRAM) $$program $(DESTDIR)$(bindir)/$$program ; done
+
+Makefile: Makefile.in config.status
+	./config.status --file=Makefile

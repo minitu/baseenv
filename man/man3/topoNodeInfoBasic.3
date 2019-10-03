@@ -1,0 +1,40 @@
+.TH topoNodeInfoBasic 3 "4/23/2018" " " ""
+.SH NAME
+topoNodeInfoBasic \-  Return very basic information on the node 
+.SH SYNOPSIS
+.nf
+int topoNodeInfoBasic(topoinfo_t *topo, int *corenum, int *socketnum,
+int *corespersocket, int *socketspernode)
+.fi
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B topo 
+- Pointer to topoinfo that was returned by topoInit.
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B corenum 
+- Points to the core number on the node.  -1 if unknown.
+.PD 1
+.PD 0
+.TP
+.B socketnum 
+- Points to the socket (chip) number on the node.  -1 if unknown.
+.PD 1
+.PD 0
+.TP
+.B corespersocket 
+- Number of cores (defined by the system) per socket (chip).
+-1 if unknown.
+.PD 1
+.PD 0
+.TP
+.B socketspernode 
+- Number of sockets (processor chips) per node.  -1 if unknown.
+.PD 1
+
+.SH RETURN VALUE
+Zero on success and non-zero on failure

@@ -1,0 +1,43 @@
+.TH MPE_FindCliqueFromNodename 3 "4/23/2018" " " ""
+.SH NAME
+MPE_FindCliqueFromNodename \-  Find cliques from the node name within a communicator 
+.SH SYNOPSIS
+.nf
+int MPE_FindCliqueFromNodename( MPI_Comm comm, int hintSize, int maxSize, 
+int *cliqueNum, int *cliqueSize,
+int cliqueRanks[] )
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B comm 
+- Communicator of processes
+.PD 1
+.PD 0
+.TP
+.B hintSize 
+- ?
+.PD 1
+.PD 0
+.TP
+.B maxSize 
+- Maximum number of ranks in cliqueRanks
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B cliqueNum 
+- Id of this clique, starting from zero
+.PD 1
+.PD 0
+.TP
+.B cliqueSize 
+- Number of processes in this clique
+.PD 1
+.PD 0
+.TP
+.B cliqueRanks 
+- Ranks of processes in this clique
+.PD 1
+

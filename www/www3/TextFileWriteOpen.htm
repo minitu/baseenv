@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>TextFileWriteOpen</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="TextFileWriteOpen"><H1>TextFileWriteOpen</H1></A>
+Open a file for writing text output from a parallel program 
+<H2>Synopsis</H2>
+<PRE>
+int TextFileWriteOpen(MPI_Comm comm, int root, const char *fname, MPI_Info info,
+                     TextFile *fh_p)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>comm </B><DD>MPI Communicator of all processes that will perform text writes
+
+<DT><B>root </B><DD>Rank of process (in <tt>comm</tt>) that will perform I/O to the file
+
+<DT><B>fname </B><DD>Name of the file to open.
+
+<DT><B>info </B><DD>MPI Info object that may be used for opening the file.  Use
+<tt>MPI_INFO_NULL</tt> for no special behavior.
+</DL>
+<P>
+<H2>Output Parameter</H2>
+<DL><DT><B>fh_p </B> <DD> Pointer to a <tt>TextFile
+</tt>
+</DL>
+<P>
+<H2>Notes</H2>
+The <tt>TextFileWriteXxx</tt> routines provide a way to ensure that multiple
+parallel processes correctly write output in a rank-ordered way.  Using
+output from individual processes, even if they are synchronized (e.g.,
+with <tt>MPI_Barrier</tt> or the <tt>seqBegin</tt> and <tt>seqEnd</tt> routines), does not
+guarantee ordered output because the aggregation of data sent by I/O routines
+on each process to a file server does not guarantee any ordering.
+<P>
+<H2>Return value</H2>
+An error code.  Currently, <tt>MPI_SUCCESS</tt> is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.
+</BODY></HTML>

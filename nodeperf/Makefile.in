@@ -1,0 +1,102 @@
+ALL: all-redirect
+
+# Set the basic directories
+prefix           = @prefix@
+exec_prefix      = @exec_prefix@
+datarootdir      = @datarootdir@
+libdir           = @libdir@
+abs_builddir     = @abs_builddir@
+abs_top_builddir = @abs_top_builddir@
+builddir         = @builddir@
+top_builddir     = @top_builddir@
+abs_srcdir       = @abs_srcdir@
+abs_top_srcdir   = @abs_top_srcdir@
+
+master_top_builddir = @master_top_builddir@
+master_top_srcdir   = @master_top_srcdir@
+include $(master_top_srcdir)/Makefile.doc
+
+CC       = @CC@
+FC       = @FC@
+CFLAGS   = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@ -I..
+FCFLAGS  = @FCFLAGS@
+COPT     = @COPT@
+FCOPT    = @FCOPT@
+BASEENV_LIB = @BASEENV_LIB@
+
+# Makefile.vec contains the options to select vectorization by the compiler.
+include $(master_top_srcdir)/Makefile.vec
+
+EXECS = stream-c stream-f spmv-c spmv-f fma-c stencil
+OTHEREXECS = transb
+
+INSTALL         = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA    = @INSTALL_DATA@
+
+SOURCES      = stream.c spmv.c mysecond.c stream.f spmv.f fma.c stencil.c
+DIST_COMMON  = Makefile.in
+DOC_FILES    =
+HEADER_FILES =
+DOC_SOURCES  = $(SOURCES)
+
+MKDIR_P = @MKDIR_P@
+DOCTEXT = @DOCTEXT@
+
+all-redirect: $(EXECS)
+
+stream-c: stream.c
+	$(CC) -o stream-c $(CPPFLAGS) $(CFLAGS) $(COPT) stream.c
+stencil: stencil.c
+	$(CC) -o stencil $(CPPFLAGS) -I../mputil -DMPUTIL_PARALLEL \
+		$(CFLAGS) $(COPT) $(OPTFLAGS) $(VECFLAGS) $(VECLIST) \
+		stencil.c $(BASEENV_LIB)
+stream-f: stream.f mysecond.o
+	$(FC) -o stream-f $(FCFLAGS) $(FCOPT) stream.f mysecond.o
+spmv-c: spmv.c
+	$(CC) -o spmv-c $(CFLAGS) $(CPPFLAGS) $(COPT) spmv.c
+spmv-f: spmv.f mysecond.o
+	$(FC) -o spmv-f $(FCFLAGS) $(FCOPT) spmv.f mysecond.o
+fma-c: fma.c
+	$(CC) -o fma-c $(CFLAGS) $(CPPFLAGS) $(COPT) fma.c
+
+.c.o:
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $(COPT) $<
+.f.o:
+	$(FC) -c $(FCFLAGS) $(FCOPT) $<
+
+clean:
+	rm -f *.o
+
+realclean: clean
+	rm -f $(EXECS) $(OTHEREXECS)
+
+distclean: realclean
+
+baseenvprogs: $(EXECS)
+baseenvlib:
+
+Makefile: Makefile.in ../config.status
+	(cd .. && ./config.status --file=nodeperf/Makefile)
+
+dist: distclean
+	@if [ "X$(distdir)" == "X" ] ; then echo "Set distdir" ; exit 1 ; fi
+	@if [ ! -d $(distdir) ] ; then mkdir $(distdir) ; fi
+	cp $(SOURCES) $(distdir)
+	if [ "X$(HEADER_FILES)" != "X" ] ; then \
+		cp $(HEADER_FILES) $(distdir) ; fi
+	cp $(DIST_COMMON) $(distdir)
+	if [ "X$(DOC_FILES)" != "X" ] ; then cp $(DOC_FILES) $(distdir) ; fi
+
+# Documentation targets
+mandoc: $(mandoc_path1) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_MAN_OPTIONS) -mpath $(mandoc_path1) -ext 1 \
+		$(DOC_SOURCES)
+htmldoc: $(htmldoc_path1) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_HTML_OPTIONS) -mpath $(htmldoc_path1) \
+		$(DOC_SOURCES)
+
+install:
+
+.PHONY: dist clean realclean distclean baseenvlib baseenvprogs mandoc htmldoc

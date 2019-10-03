@@ -1,0 +1,27 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>TextFileReadPrintStats</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="TextFileReadPrintStats"><H1>TextFileReadPrintStats</H1></A>
+Print performance statistics about a TextFile 
+<H2>Synopsis</H2>
+<PRE>
+int TextFileReadPrintStats(TextFile fh, FILE *fp)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>fh </B><DD>TextFile for which statistics should be printed
+
+<DT><B>fp </B><DD>File handle for output (stdout is common)
+</DL>
+<P>
+<H2>Notes</H2>
+This routine is collective (it computes some min and max values over all
+processes in fh).  It makes no attempt to order the output; use
+TextFileReadGetStats to access and control the output of this performance
+data.
+<P>
+</BODY></HTML>

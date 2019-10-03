@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPIX_Nodecomm_create</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPIX_Nodecomm_create"><H1>MPIX_Nodecomm_create</H1></A>
+Create communicators for intra- and inter-node communication 
+<H2>Synopsis</H2>
+<PRE>
+int MPIX_Nodecomm_create(MPI_Comm incomm, MPI_Comm *nodecomm,
+                       MPI_Comm *leadercomm, int *noderank, int *nnodes)
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>incomm </B> <DD> Input communicator
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL>
+<DT><B>nodecomm   </B><DD>Communicator containing all processes on the same node
+
+<DT><B>leadercomm </B><DD>A communicator of the leaders on each node, defined as
+the processes with rank 0 in nodecomm.  If the calling process is not
+in rank 0 in nodecomm, sets to <tt>MPI_COMM_NULL
+</tt>
+<DT><B>noderank   </B><DD>Rank of node in <tt>leadercomm</tt>, valid on all processes
+
+<DT><B>nnodes     </B><DD>Number of nodes.
+</DL>
+<P>
+<H2>Notes</H2>
+This routine is collective over <tt>incomm</tt>.
+Information is saved in an attribute, so that information about the
+node and leader communicators can be recovered from an attribute (which
+is private to this module).
+<P>
+There is no requirement that every node have the same number of processes.
+<P>
+Optionally, if a suitable API is available, this routine will also determine
+and store information about the number of processor chips on the node of
+the calling process, as well as which chip an which core on that chip the
+calling process was running on when this routine was called.  If this
+information is not available, a value of <tt>-1</tt> is stored for those fields
+in the nodeinfo_t structure.  This data is not returned by this routine,
+but is available to the nodecart routines.
+</BODY></HTML>

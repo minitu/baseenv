@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>TextFileWritePrintf</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="TextFileWritePrintf"><H1>TextFileWritePrintf</H1></A>
+Write ordered output to a file, using printf-style 
+<H2>Synopsis</H2>
+<PRE>
+int TextFileWritePrintf(TextFile fh, const char *restrict format, ...)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>fh  </B><DD>TextFile previously opened
+
+<DT><B>format </B><DD><tt>printf</tt> style format
+
+<DT><B>... </B><DD>Parameters for the <tt>format</tt>.
+</DL>
+<P>
+<H2>Notes</H2>
+This routine writes to the file (or FILE handle) previously opened.  The
+output is ordered with respect to the rank in the communicator associated
+with the TextFile.  The output is buffered in this routine; a collective
+call to <tt>TextFileWriteFlush</tt> is requried to ensure that the data is output.
+The usage is nearly identical to <tt>fprintf</tt>; the only difference is that
+instead of a <tt>FILE</tt> as the first parameter, a <tt>TextFile</tt> must be provided.
+<P>
+<H2>Return value</H2>
+An error code.  Currently, <tt>MPI_SUCCESS</tt> is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.
+<P>
+</BODY></HTML>

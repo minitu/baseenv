@@ -1,0 +1,54 @@
+.TH topodistInit 3 "1/3/2019" " " ""
+.SH NAME
+topodistInit \-  Initialize the routines to provide data about communication topology 
+.SH SYNOPSIS
+.nf
+int topodistInit(MPI_Comm comm, int nsend, int sendrank[],
+int nrecv, int recvrank[],
+topoinfo_t *ti, topodist_t **td)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B comm 
+- MPI Communicator
+.PD 1
+.PD 0
+.TP
+.B nsend 
+- Number of processes that this process sends to
+.PD 1
+.PD 0
+.TP
+.B sendrank 
+- Array of ranks of processes that this process sends to
+.PD 1
+.PD 0
+.TP
+.B nrecv 
+- Number of processes that this process receives from
+.PD 1
+.PD 0
+.TP
+.B recvrank 
+- Array of ranks of processes that this process receives from
+.PD 1
+.PD 0
+.TP
+.B ti 
+- Pointer to valid (initialized) 
+.I topoinfo_t
+
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B td 
+- Pointer to valid and initialized 
+.I topodist_t
+structure
+.PD 1
+
+.SH RETURN VALUE
+

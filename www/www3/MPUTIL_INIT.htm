@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPUTIL_INIT</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPUTIL_INIT"><H1>MPUTIL_INIT</H1></A>
+Initialize the MPUTIL timing environment 
+<H2>Input Parameter</H2>
+<DL><DT><B>thread_level </B> <DD> Indicate the desired level of threadedness.  See below.
+</DL>
+<P>
+<H2>Notes</H2>
+When benchmarking codes on SMP nodes, it is common to run the benchmark
+on a single core. However, in many applications, this is not the configuration
+that is important for the application.  It is common for the application to
+be running the same (or similar) code on all cores at the same time.
+The <tt>MPUTIL_XXX</tt> macros provide a relatively easy way to run the same,
+single-core benchmark on 1, 2, 3, ..., k cores for a node with k total cores.
+Additional macros makes it easy to generate simple tables where there is
+a separate column for each number of active cores for the benchmark.
+See <tt>MPUTIL_LABEL</tt> and <tt>MPUTIL_OUTAPP</tt> for output.
+<P>
+A typical program that uses these macros will have the following structure:
+<PRE>
+   ...
+   MPUTIL_INIT(0);
+   ...any code that is executed only once, independent of the number of cores
+   MPUTIL_BEGIN;
+   ...any code that each active core must execute, such as initialization
+   MPUTIL_LABEL("label text for row, in printf format");
+   MPUTIL_SYNC;
+   ... benchmark code, including timer calls.  Total time in tval
+   MPUTIL_OUTAPP("\t%.2e\n",tval);
+   MPUTIL_END;
+   MPUTIL_FINALIZE;
+</PRE>
+
+<P>
+The <tt>thread_level</tt> is used only when creating the parallel version, which
+uses MPI processes to execute the benchmark in parallel.  To simplify the
+interface, this does not use the MPI-defined levels (thus, the benchmark
+never need inlude mpi.h).  The valid values are <tt>0</tt> for no threads used
+(<tt>MPI_THREAD_SINGLE</tt>), <tt>1</tt> for threads used in loops (<tt>MPI_THREAD_FUNNELED</tt>),
+and <tt>2</tt> for benchmarks that need <tt>MPI_THREAD_MULTIPLE</tt>.  Most regular
+benchmarks will use <tt>0</tt>, but OpenMP benchmarks will need to set
+<tt>thread_level</tt> to <tt>1</tt>.
+</BODY></HTML>

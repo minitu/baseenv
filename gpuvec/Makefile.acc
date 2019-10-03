@@ -1,0 +1,35 @@
+# This file contains the options to enable OpenACC for the compilers that
+# support it.
+
+# May need an ACCEL_ARCH to further optimize
+ifeq "$(COMPILER_FAMILY)" "pgi"
+
+# ACC device output
+ifeq "$(COMPILER_ARCH)" "tesla"
+ACCFLAGS = -acc -ta=tesla
+else ifeq "$(COMPILER_ARCH)" "multicore"
+ACCFLAGS = -acc -ta=multicore -DDEVICE_IS_HOST=1
+else
+# The default device is NVIDIA Tesla
+#ACCFLAGS = -acc -ta=tesla
+# Some installaions of the PGI compiler fail with -ta=tesla and need,
+# for example, -ta=tesla:cc70 .  It may be more portable to leave off the
+# -ta option and use the default for the accellerator
+ACCFLAGS = -acc
+endif
+
+ACCLIST  = -Minfo=accel
+endif  # COMPILER_FAMILY == pgi
+
+ifeq "$(COMPILER_FAMILY)" "cray"
+ACCFLAGS = -hpragma=acc -hnopragma=omp
+ACCLIST  = -hmsgs
+endif
+
+# No known support for OpenACC
+ifeq "$(COMPILER_FAMILY)" "xlc"
+ACCFLAGS =
+ACCLIST  =
+endif
+
+

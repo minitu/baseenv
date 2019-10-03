@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topoentry_t</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topoentry_t"><H1>topoentry_t</H1></A>
+Structure containing information about a level of the system topology 
+<H2>Synopsis</H2>
+<PRE>
+typedef struct topoentry_t {
+    topoType_t  topoType;      /* e.g., unknown, torus, mesh, bus, tree */
+    int         dim;           /* number of dimensions in topology */
+    topoCoord_t coords;        /* coordinates in topology */
+    topoCoord_t maxtopocoords; /* maximum value of valid coordinate in
+                               topology */
+    topoCoord_t maxcoords;     /* maximum value of valid coordinates */
+    topoCoord_t mincoords;     /* minimum value of valid coordinates */
+    struct topoentry_t *next;
+} topoentry_t;
+</PRE>
+<H2>Notes</H2>
+This structure may be examined by the user to determine properties of the
+system topology.  Most systems will have at least two levels, with <tt>topoType
+'TOPO_CORE</tt> and <tt>TOPO_CHIP</tt>.  Additional levels may include <tt>TOPO_NODE</tt> and
+for systems with a high performance mesh interconnect, <tt>TOPO_MESH</tt>.  Other
+topology types are defined.
+<P>
+Each level may have siblings (e.g., cores on the same chip), children
+(e.g., cores of the chip), and parents (e.g., the node hosting a chip).
+Coordinates are provided to identify siblings.  For simple arrangements,
+such as cores on a chip, this is just a numbering starting from zero;
+specifically, a one-tuple.  For a <tt>TOPO_MESH</tt> or <tt>TOPO_TORUS</tt> topology,
+the coordinates will be an n-tuple, for an n-Dimensional mesh.
+<P>
+The source code for the routine <tt>topoPrint</tt> shows how to use some of the
+fields in this structure.
+</BODY></HTML>

@@ -1,0 +1,93 @@
+.TH BENV_GetSizes 3 "1/3/2019" " " ""
+.SH NAME
+BENV_GetSizes \-  Return an array of integers from the argument list 
+.SH SYNOPSIS
+.nf
+int *BENV_GetSizes(int argc, char *argv[], const char *argname, int *nsizes)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B argc 
+- argument count
+.PD 1
+.PD 0
+.TP
+.B argname 
+- argument name
+.PD 1
+
+.SH INPUT/OUTPUT PARAMETER
+.PD 0
+.TP
+.B argv 
+- argument vector on input.  If 
+.I argname
+is found, the values
+of argv for that argument and the following argument are set to null.
+.PD 1
+
+.SH OUTPUT PARAMETER
+.PD 0
+.TP
+.B nsizes 
+- number of values returned
+.PD 1
+
+.SH RETURN VALUE
+Pointer to an array, allocated with 
+.I malloc
+, containing the integers
+On error, 
+.I nsizes == -1
+and the return value is 
+.I NULL
+\&.
+
+The user should 
+.I free(ptr)
+where 
+.I ptr
+is the value returned by this routine.
+
+.SH NOTES
+This routine looks for a pair of arguments of the form
+.nf
+\&.
+\&.
+\&.
+--argname list
+.fi
+
+where 
+.I list
+may be either a comma-separated list of values or a range with
+an optional stride.  Specifically,
+.nf
+a,b,...,c (comma separated list)
+a:b or a:b:c (range with additive stride)
+a:b*c (range with multiplicative stride)
+.fi
+
+Here, 
+.I a
+and 
+.I b
+may have postfix 
+.I k
+or 
+.I K
+for times 1024 and 
+.I m
+or 
+.I M
+for time 1024*1024.
+
+This routine sets found arguments to null to permit other routines to process
+other arguments; this requires all routines to permit a 
+.I NULL
+argument for
+a value in 
+.I argv
+\&.
+

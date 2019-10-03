@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topodistNodeCommInfo</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topodistNodeCommInfo"><H1>topodistNodeCommInfo</H1></A>
+Provide some information about off-node communication 
+<H2>Synopsis</H2>
+<PRE>
+int topodistNodeCommInfo(topodist_t *td, MPI_Comm comm,
+                       int *partnerOnNode, int *partnerOffNode,
+                       MPI_Comm *nodecomm_p, int *totalOffNode)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>td </B><DD>Topodist information returned by topodistInit
+
+<DT><B>comm </B><DD>Communicator of processes to use.  This routine is collective over
+this communicator.  The most common choice of <tt>comm</tt> is <tt>MPI_COMM_WORLD
+</tt>
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL>
+<DT><B>partnerOnNode </B><DD>Number of processes that this process communicates with
+that are on the same node
+
+<DT><B>partnerOffNode </B><DD>As above, but for partners that are off node
+
+<DT><B>nodecomm_p     </B><DD>A communicator containing only the processes that share
+the node with the calling process.
+
+<DT><B>totalOffNode </B><DD>The total number of processes on this node that are
+communicating to one or more processes on a different node
+</DL>
+<P>
+</BODY></HTML>

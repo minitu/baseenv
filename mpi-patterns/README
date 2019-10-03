@@ -1,0 +1,62 @@
+This directory contains some simple MPI communication patterns that
+can be run to get some performance results.  These complement other
+benchmarks in this collection, which are moore specific, such as the
+mpptest program (in perftest) and the halo performance test (in
+haloperf), or the mpi_t, which document the number of control and
+performance variables.
+
+mpiexec -n 2 ./vecperf --size 128:16k*2
+
+The option -o filename will direct the output of vecperf to a file:
+
+mpiexec -n 2 ./vecperf --size 128:16k*2 -o v.txt
+
+To test stencil exchanges,
+
+mpiexec -n 64 ./stencil
+
+After running stencil, check the performance of the RMA runs: NR-D and NR-U
+On some implementations of MPI, RMA performance, particularly with derived
+datatypes, is extremely poor.  If the performance for NR-D is poor, add
+--normadtype to the arguments.  If the performance for NR-U is poor, add
+--normacontig to the arguments.  If both are poor, use --norma .  For example,
+
+mpiexec -n 4096 ./stencil --normadtype
+
+The program stencil runs several different approaches to communication.  These
+are noted in the second column.  These are:
+
+  <Blocking | Nonblocking> <Point2point | RMA | Sharedmemory | Collective-sparse>
+     <? Overlap> <Userdata-packing | Datatype> [ <? Persistent-request> ]
+
+By default, the tests are run on MPI_COMM_WORLD and on communicators that
+are not congurent (have the same group members and ordering). By adding
+the argument --noskip , the tests will include these communicators.
+To run the tests with the sparse collectives, even if the communicator
+created by MPI_Cart_create is congruent to MPI_COMM_WORLD, add --withcart:
+
+    mpiexec -n 4096 ./stencil --normadtype --withcart
+
+Message sizes can be specified with --size range, as in
+
+    mpiexec -n 4096 ./stencil --size 128,256,512,1024 --normadtype --withcart
+
+(this list of sizes is the default).
+
+Finally, the output from stencil goes to stdout by default.  Use -o filename
+to output to a file (name s4k.txt in this case):
+
+    mpiexec -n 4096 ./stencil --normadtype --withcart -o s4k.txt
+
+
+Special Notes on Building Codes
+===============================
+By default, the code in stencil does *not* compute the total heat in each
+iteration.  This is because some (many?) systems cannot vectorize the
+code that does this computation, and we want stencil to show the potential
+performance for this simple (and only 2-D) mesh sweep. To change that, add
+
+-DCOMPUTE_HEAT_EACH_ITERATION=1
+
+to the CPPFLAGS and rebuild *all* of the stencil routines (all files that
+start with "stencil").

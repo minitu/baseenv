@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPUTIL_OUTAPP</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPUTIL_OUTAPP"><H1>MPUTIL_OUTAPP</H1></A>
+Append output to a row of output 
+<H2>Input Parmeters</H2>
+<DL><DT><B>args </B> <DD> printf style arguments (varargs).
+</DL>
+<P>
+<H2>Notes</H2>
+This macro should be called after <tt>MPUTIL_LABEL</tt> to add data to the row
+of output data. A newline ('\n') should be used for the last value
+intended for the row.
+<P>
+When used to benchmark on muiltiple cores, the macros <tt>MPUTIL_LABEL
+</tt>and <tt>MPUTIL_OUTALL</tt> together should be used to output timing data.
+When used on a single core (the non-parallel option), each acts like
+<tt>printf</tt>.  In the parallel case, the output has one column containing the
+data specified by <tt>MPUTIL_OUTAPP</tt> for each number of active cores; the
+leftmost column is the text provided by <tt>MPUTIL_LABEL</tt>.
+<P>
+The output from both <tt>MPUTIL_LABEL</tt> and <tt>MPUTIL_OUTAPP</tt> is generated
+when the timing block is completed with <tt>MPUTIL_END</tt>.
+</BODY></HTML>

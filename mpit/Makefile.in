@@ -1,0 +1,104 @@
+all: all-redirect
+
+# Set the basic directories
+prefix           = @prefix@
+exec_prefix      = @exec_prefix@
+datarootdir      = @datarootdir@
+abs_builddir     = @abs_builddir@
+abs_top_builddir = @abs_top_builddir@
+builddir         = @builddir@
+top_builddir     = @top_builddir@
+abs_srcdir       = @abs_srcdir@
+abs_top_srcdir   = @abs_top_srcdir@
+
+includedir       = @includedir@
+libdir           = @libdir@
+bindir           = @bindir@
+
+master_top_builddir = @master_top_builddir@
+master_top_srcdir   = @master_top_srcdir@
+include $(master_top_srcdir)/Makefile.doc
+
+MPI_DIR = @MPI_DIR@
+# Some systems may want to add -static to the MPICC line
+MPICC           = @MPICC@
+MPIFORT         = @MPIFORT@
+RANLIB          = @RANLIB@
+MKDIR_P         = @MKDIR_P@
+INSTALL         = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA    = @INSTALL_DATA@
+DOCTEXT         = @DOCTEXT@
+
+CPPFLAGS = @DEFS@
+CFLAGS = @CFLAGS@
+COPT = @COPT@
+FCOPT = @FCOPT@
+SUBDIRS =
+
+EXECS = mpit_vars
+BASEENV_LIB = @BASEENV_LIB@
+OTHEREXECS =
+OTHEROBJS  =
+
+SOURCES      = mpit_vars.c
+HEADER_FILES =
+DIST_COMMON  = Makefile.in
+DOC_FILES    =
+DOC_SOURCES  = $(SOURCES)
+
+# Default rules to force use of the MPI compilers
+.c.o:	$?
+	$(MPICC) $(CFLAGS) $(COPT) $(CPPFLAGS) -c $(?) -o $(@)
+.f.o:   $?
+	$(MPIFORT) $(FFLAGS) $(FCOPT) -c $(?) -o $(@)
+.f90.o: $?
+	$(MPIFORT) $(FFLAGS) $(FCOPT) -c $(?) -o $(@)
+
+default:
+
+all-redirect: mpit_vars
+
+baseenvprogs: $(EXECS)
+baseenvlib:
+
+mpit_vars: mpit_vars.o $(BASEENV_LIB)
+	$(MPICC) $(CFLAGS) $(COPT) $(LDFLAGS) -o mpit_vars mpit_vars.o $(BASEENV_LIB)
+
+Makefile: Makefile.in ../config.status
+	(cd .. && ./config.status --file=mpit/Makefile)
+
+
+clean::
+	rm -f *.o *.ps *.pdf $(OTHEROBJS) fpmpi_profile.txt *.chkpt *~
+	for dir in $(SUBDIRS) ; do (cd $$dir && $(MAKE) clean) ; done
+
+realclean: clean
+	rm -f $(EXECS) $(OMPEXECS) $(OTHEREXECS) *.exe *.stackdump
+
+distclean: realclean
+	for dir in $(SUBDIRS) ; do (cd $$dir && $(MAKE) realclean) ; done
+	rm -f config.log config.status
+	rm -rf autom4te.cache
+
+dist:
+	@if [ "X$(distdir)" == "X" ] ; then echo "Set distdir" ; exit 1 ; fi
+	@if [ ! -d $(distdir) ] ; then mkdir $(distdir) ; fi
+	if [ "X$(SOURCES)" != "X" ] ; then cp $(SOURCES) $(distdir) ; fi
+	if [ "X$(HEADER_FILES)" != "X" ] ; then cp $(HEADER_FILES) $(distdir) ; fi
+	if [ "X$(DIST_COMMON)" != "X" ] ; then cp $(DIST_COMMON) $(distdir) ; fi
+	if [ "X$(DOC_FILES)" != "X" ] ; then cp $(DOC_FILES) $(distdir) ; fi
+
+# Documentation targets
+mandoc: $(mandoc_path1) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_MAN_OPTIONS) -mpath $(mandoc_path1) -ext 1 \
+		$(DOC_SOURCES)
+htmldoc: $(htmldoc_path1) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_HTML_OPTIONS) -mpath $(htmldoc_path1) \
+		$(DOC_SOURCES)
+
+install:
+	$(INSTALL_PROGRAM) mpit_vars $(DESTDIR)$(bindir)/mpit_vars
+
+
+.PHONY: baseenvlib baseenvprogs clean realclean distclean dist mandoc htmldoc

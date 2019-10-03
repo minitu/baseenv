@@ -1,0 +1,66 @@
+#! /usr/bin/env perl
+#
+use List::Util qw(max);
+#
+$vecfile = $ARGV[0];
+$novecfile = $ARGV[1];
+print "Using $vecfile and $novecfile\n";
+open(VF,"<$vecfile") || die "Could not open $vecfile";
+open(NVF, "<$novecfile") || die "Could not open $novecfile";
+# Read over headers
+$basetype = "";
+while (<VF>) {
+    if (/^Vectorization tests:\s+Compiled with (.*)/) {
+	$vecflags = $1;
+	print "Vector options: $vecflags\n";
+    }
+    if (/^Basetype is\s*([A-Za-z0-9]+)/) {
+	$basetype = $1;
+	print "Using $basetype\n";
+    }
+    if (/^Loop/) { last; }
+}
+while (<NVF>) {
+    if (/^Vectorization tests:\s+Compiled with (.*)/) {
+	$novecflags = $1;
+	print "Novector options: $novecflags\n";
+    }
+    # Skip any other lines
+    if (/^Loop/) { last; }
+}
+print "Test\tVec time\tNoVec time\tSpeedup\tChecksum reldiff\tDescription\n";
+while (<VF>) {
+    chomp;
+    @vals = split(/\t/);
+    $nvfline = <NVF>;
+    chomp($nvfline);
+    @nvvals = split(/\t/,$nvfline);
+    if ($vals[0] eq $nvvals[0]) {
+	$output[0] = $vals[0];
+	$output[1] = $vals[1];
+	$output[2] = $nvvals[1];
+	if ($output[1] > 0.0) {
+	    $output[3] = sprintf("%.02f",$output[2] / $output[1]);
+        }
+        else {
+            $output[3] = "inf";
+        }
+	$output[4] = 0;
+	if ($vals[3] ne $nvvals[3]) {
+	    $mval = max(abs($vals[3]),abs($nvvals[3]));
+	    # $mval > 0 because the two values are different, so at least
+	    # one must be different from zero.
+	    $relerr = abs($vals[3]-$nvvals[3])/$mval;
+	    $output[4] = $relerr;
+	    print STDERR "Checksums for $vals[0] do not match: $vals[3] != $nvvals[3]\n";
+	}
+	if (!defined($vals[4])) { $vals[4] = ""; }
+	$output[5] = $vals[4];
+	print join("\t",@output) . "\n";
+    }
+    else {
+	print STDERR "Panic: inconsistent output at $_ and $nvfline";
+    }
+}
+close(VF);
+close(NVF);

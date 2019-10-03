@@ -1,0 +1,55 @@
+.TH MPIX_GetSocketAndCore 3 "1/3/2019" " " ""
+.SH NAME
+MPIX_GetSocketAndCore \-  Get the socket and Core on which the calling process was running 
+.SH SYNOPSIS
+.nf
+int MPIX_GetSocketAndCPU(int *nsocket, int *socketrank, int *rankinsocket)
+.fi
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B nsocket 
+- Number of sockets on the node
+.PD 1
+.PD 0
+.TP
+.B socketrank 
+- Rank of the socket on which the process is running
+.PD 1
+.PD 0
+.TP
+.B rankinsocket 
+- Rank of the core in the socket on which the process is
+running
+.PD 1
+
+.SH RETURN VALUE
+.I 0
+on success and 
+.I -1
+on failure
+
+.SH NOTES
+The values returned reflect the socket and core that was running the calling
+process at some time.  The runtime system or operating system may move the
+process to another core or socket. The 
+.I rankinsocket
+may not be
+consecutive; for example, on a Cray XE6, these might be only even values,
+since it is common to allocate processes to core-modules, which consist of
+a pair of cores.
+
+.SH ENVIRONMENT VARIABLES
+.PD 0
+.TP
+.B TOPO_CORESPERCHIP 
+- If set to an integer value (as a string), then every
+socket (processor chip) is considered to have this many cores.
+.PD 1
+.PD 0
+.TP
+.B TOPO_CHIPSPERNODE 
+- If set to an integer value (as a string), then every
+node is considered to have this many chips (sockets).
+.PD 1
+

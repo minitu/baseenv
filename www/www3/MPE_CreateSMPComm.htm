@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPE_CreateSMPComm</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPE_CreateSMPComm"><H1>MPE_CreateSMPComm</H1></A>
+Create a communicator for the processes on the same node 
+<H2>Synopsis</H2>
+<PRE>
+int MPE_CreateSMPComm( MPI_Comm comm, 
+                      MPI_Comm *localComm, MPI_Comm *rootComm, int *nnodes )
+</PRE>
+<H2>Input Parameter</H2>
+<DL><DT><B>comm </B> <DD> Communicator of processes
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL>
+<DT><B>localComm </B><DD>Communicator of processes on the same node 
+
+<DT><B>rootComm </B><DD>Communicator of leaders on the different nodes
+
+<DT><B>nnodes   </B><DD>My node number
+</DL>
+<P>
+</BODY></HTML>

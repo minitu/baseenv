@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPIX_GetSocketAndCore</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPIX_GetSocketAndCore"><H1>MPIX_GetSocketAndCore</H1></A>
+Get the socket and Core on which the calling process was running 
+<H2>Synopsis</H2>
+<PRE>
+int MPIX_GetSocketAndCPU(int *nsocket, int *socketrank, int *rankinsocket)
+</PRE>
+<H2>Output Parameters</H2>
+<DL>
+<DT><B>nsocket </B><DD>Number of sockets on the node
+
+<DT><B>socketrank </B><DD>Rank of the socket on which the process is running
+
+<DT><B>rankinsocket </B><DD>Rank of the core in the socket on which the process is
+running
+</DL>
+<P>
+<H2>Return Value</H2>
+<tt>0</tt> on success and <tt>-1</tt> on failure
+<P>
+<H2>Notes</H2>
+The values returned reflect the socket and core that was running the calling
+process at some time.  The runtime system or operating system may move the
+process to another core or socket. The <tt>rankinsocket</tt> may not be
+consecutive; for example, on a Cray XE6, these might be only even values,
+since it is common to allocate processes to core-modules, which consist of
+a pair of cores.
+<P>
+<H2>Environment Variables</H2>
+<DL>
+<DT><B>TOPO_CORESPERCHIP </B><DD>If set to an integer value (as a string), then every
+socket (processor chip) is considered to have this many cores.
+
+<DT><B>TOPO_CHIPSPERNODE </B><DD>If set to an integer value (as a string), then every
+node is considered to have this many chips (sockets).
+</DL>
+<P>
+</BODY></HTML>

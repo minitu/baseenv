@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topoMeshHopDistance</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topoMeshHopDistance"><H1>topoMeshHopDistance</H1></A>
+Computing the distance from the calling process to the process with the given rank 
+<H2>Synopsis</H2>
+<PRE>
+int topoMeshHopDistance(topodist_t *dt, int rank, int *dist)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>dt </B><DD>Pointer to a valid topodist_t structure
+
+<DT><B>rank </B><DD>Rank of the process to determine the distance to.  See notes.
+</DL>
+<P>
+<H2>Output Parameter</H2>
+<DL><DT><B>dist </B> <DD> distance in hops to the process with rank <tt>rank
+</tt>
+</DL>
+<P>
+<H2>Return value</H2>
+<tt>0</tt> on success, non-zero otherwise.  <tt>-1</tt> if the topology does not include
+a mesh or torus.
+<P>
+<H2>Notes</H2>
+<tt>rank</tt> must belong to one of the send ranks used to initialize the topodist_t
+<tt>dt</tt>.  Thus, this routine is <em>not</em> collective and may be used by any process
+at any time once <tt>dt</tt> has been initialized.
+<P>
+The distance is computing in <em>hops</em>: this is the 1-norm or Manhatten distance
+between the calling process and the process with <tt>rank</tt> in a mesh or torus
+topology.
+</BODY></HTML>

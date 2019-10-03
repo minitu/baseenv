@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPUTIL_MASTER_BEGIN</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPUTIL_MASTER_BEGIN"><H1>MPUTIL_MASTER_BEGIN</H1></A>
+Begin a block of code to be executed by only the master process 
+<H2>Notes</H2>
+This macro defines a block of code to be executed by only a single process,
+even in the parallel case.  For example, it can be used to output a
+progress indicator, as in:
+<PRE>
+ MPUTIL_BEGIN
+ ...
+ MPUTIL_MASTER_BEGIN
+ printf("Running test with %d processes\n", MPUTIL_CURSIZE)
+ MPUTIL_MASTER_END
+ ...
+ MPUTIL_END
+</PRE>
+
+</BODY></HTML>

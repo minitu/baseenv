@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topoPrint</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topoPrint"><H1>topoPrint</H1></A>
+Print basic information about the topology 
+<H2>Synopsis</H2>
+<PRE>
+int topoPrint(FILE *fp, const char *leader, topoinfo_t *topo)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>fp </B><DD>FILE pointer for output
+
+<DT><B>leader </B><DD>string to prepend each line of output
+
+<DT><B>topo </B><DD>pointer to topology info
+</DL>
+<P>
+<H2>Return value</H2>
+0 on success, non-zero on failure.
+<P>
+<H2>Thread Safety</H2>
+This routine is not thread safe.
+</BODY></HTML>

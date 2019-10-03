@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPE_FindCliqueFromName</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPE_FindCliqueFromName"><H1>MPE_FindCliqueFromName</H1></A>
+Given a name that is unique to a node, find the ranks of processes on the same node 
+<H2>Synopsis</H2>
+<PRE>
+int MPE_FindCliqueFromName(const char *name, MPI_Comm comm,
+                         int hintSize, int maxSize,
+                         int *cliqueNum, int *cliqueSize, int cliqueRanks[])
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>name </B><DD>name of the node on which the process is running
+
+<DT><B>comm </B><DD>communicator 
+
+<DT><B>hintSize </B><DD>Used to control initial hash size
+
+<DT><B>maxSize </B><DD>Maximum number of ranks in cliqueRanks
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL>
+<DT><B>cliqueNum </B><DD>Id of this clique, starting from zero
+
+<DT><B>cliqueSize </B><DD>Number of processes in this clique
+
+<DT><B>cliqueRanks </B><DD>Ranks of processes in this clique
+</DL>
+<P>
+<H2>Note</H2>
+This is the general routine.  A number of convenience routines
+are provided to create communicators from cliques, and to return
+cliques in a communicator by using the node name.
+</BODY></HTML>

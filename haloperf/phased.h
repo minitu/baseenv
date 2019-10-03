@@ -1,0 +1,1 @@
+int setupPhasedTest( HaloTest *self );

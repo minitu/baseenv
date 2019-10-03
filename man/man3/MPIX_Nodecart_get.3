@@ -1,0 +1,44 @@
+.TH MPIX_Nodecart_get 3 "1/3/2019" " " ""
+.SH NAME
+MPIX_Nodecart_get \-  Retrieves Cartesian topology information associated with a communicator 
+.SH SYNOPSIS
+.nf
+int MPIX_Nodecart_get(MPI_Comm comm, int maxdims, int dims[], int periods[],
+int coords[])
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B comm 
+- communicator with Cartesian structure (handle)
+.PD 1
+.PD 0
+.TP
+.B maxdims 
+- length of vectors  
+.I dims
+, 
+.I periods
+, and 
+.I coords
+in the calling program (integer)
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B dims 
+- number of processes for each Cartesian dimension (array of integer)
+.PD 1
+.PD 0
+.TP
+.B periods 
+- periodicity (true/false) for each Cartesian dimension
+(array of logical)
+.PD 1
+.PD 0
+.TP
+.B coords 
+- coordinates of calling process in Cartesian structure
+(array of integer)
+.PD 1

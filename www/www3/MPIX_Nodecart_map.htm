@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>MPIX_Nodecart_map</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="MPIX_Nodecart_map"><H1>MPIX_Nodecart_map</H1></A>
+Maps process to Cartesian topology information 
+<H2>Synopsis</H2>
+<PRE>
+int MPIX_Nodecart_map(MPI_Comm comm, int ndims, const int dims[],
+                     const int periods[], int *newrank)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>comm </B><DD>input communicator (handle)
+
+<DT><B>ndims </B><DD>number of dimensions of Cartesian structure (integer)
+
+<DT><B>dims </B><DD>integer array of size <tt>ndims</tt> specifying the number of processes in
+each coordinate direction
+
+<DT><B>periods </B><DD>logical array of size <tt>ndims</tt> specifying the periodicity
+specification in each coordinate direction
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL><DT><B>newrank </B> <DD> reordered rank of the calling process; <tt>MPI_UNDEFINED</tt> if
+calling process does not belong to grid (integer)
+</DL>
+<P>
+</BODY></HTML>

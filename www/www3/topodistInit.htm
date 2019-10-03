@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>topodistInit</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="topodistInit"><H1>topodistInit</H1></A>
+Initialize the routines to provide data about communication topology 
+<H2>Synopsis</H2>
+<PRE>
+int topodistInit(MPI_Comm comm, int nsend, int sendrank[],
+                int nrecv, int recvrank[],
+                topoinfo_t *ti, topodist_t **td)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>comm </B><DD>MPI Communicator
+
+<DT><B>nsend </B><DD>Number of processes that this process sends to
+
+<DT><B>sendrank </B><DD>Array of ranks of processes that this process sends to
+
+<DT><B>nrecv </B><DD>Number of processes that this process receives from
+
+<DT><B>recvrank </B><DD>Array of ranks of processes that this process receives from
+
+<DT><B>ti </B><DD>Pointer to valid (initialized) <tt>topoinfo_t
+</tt>
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL><DT><B>td </B> <DD> Pointer to valid and initialized <tt>topodist_t</tt> structure
+</DL>
+<P>
+<H2>Return Value</H2>
+<P>
+</BODY></HTML>

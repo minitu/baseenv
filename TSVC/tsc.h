@@ -1,0 +1,6 @@
+/* Not yet in use */
+#define LEN 30000
+#define LEN2 500
+#define BASETYPE float
+
+int dummy(BASETYPE a[LEN], BASETYPE b[LEN], BASETYPE c[LEN], BASETYPE d[LEN], BASETYPE e[LEN], BASETYPE aa[LEN2][LEN2], BASETYPE bb[LEN2][LEN2], BASETYPE cc[LEN2][LEN2], BASETYPE s);

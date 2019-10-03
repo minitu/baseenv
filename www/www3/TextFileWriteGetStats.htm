@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>TextFileWriteGetStats</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="TextFileWriteGetStats"><H1>TextFileWriteGetStats</H1></A>
+Return performance statistics about a TextFile 
+<H2>Synopsis</H2>
+<PRE>
+int TextFileWriteGetStats(TextFile fh, int *tsize, double t[],
+                        MPI_Offset *bytesWritten)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>fh </B><DD>TextFile
+
+<DT><B>tsize </B><DD>Size of array <tt>t
+</tt>
+</DL>
+<P>
+<H2>Output Parameters</H2>
+<DL>
+<DT><B>t </B><DD>Time values for different operations
+
+<DT><B>bytesWritten </B><DD>Number of bytes written by this process
+</DL>
+<P>
+<H2>Notes</H2>
+This is not a collective routine - each process can read its own data
+independently.
+<P>
+<H2>Return value</H2>
+An error code.  Currently, <tt>MPI_SUCCESS</tt> is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.
+</BODY></HTML>

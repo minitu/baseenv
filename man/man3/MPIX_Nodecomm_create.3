@@ -1,0 +1,63 @@
+.TH MPIX_Nodecomm_create 3 "1/3/2019" " " ""
+.SH NAME
+MPIX_Nodecomm_create \-  Create communicators for intra- and inter-node communication 
+.SH SYNOPSIS
+.nf
+int MPIX_Nodecomm_create(MPI_Comm incomm, MPI_Comm *nodecomm,
+MPI_Comm *leadercomm, int *noderank, int *nnodes)
+.fi
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B incomm 
+- Input communicator
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B nodecomm   
+- Communicator containing all processes on the same node
+.PD 1
+.PD 0
+.TP
+.B leadercomm 
+- A communicator of the leaders on each node, defined as
+the processes with rank 0 in nodecomm.  If the calling process is not
+in rank 0 in nodecomm, sets to 
+.I MPI_COMM_NULL
+
+.PD 1
+.PD 0
+.TP
+.B noderank   
+- Rank of node in 
+.I leadercomm
+, valid on all processes
+.PD 1
+.PD 0
+.TP
+.B nnodes     
+- Number of nodes.
+.PD 1
+
+.SH NOTES
+This routine is collective over 
+.I incomm
+\&.
+
+Information is saved in an attribute, so that information about the
+node and leader communicators can be recovered from an attribute (which
+is private to this module).
+
+There is no requirement that every node have the same number of processes.
+
+Optionally, if a suitable API is available, this routine will also determine
+and store information about the number of processor chips on the node of
+the calling process, as well as which chip an which core on that chip the
+calling process was running on when this routine was called.  If this
+information is not available, a value of 
+.I -1
+is stored for those fields
+in the nodeinfo_t structure.  This data is not returned by this routine,
+but is available to the nodecart routines.

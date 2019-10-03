@@ -1,0 +1,160 @@
+/* baseenv.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Git Hash value for baseenv for this release */
+#undef BASEENV_GITHASH
+
+/* Define to a macro mangling the given C identifier (in lower and upper
+   case), which must not contain underscores, for linking with Fortran. */
+#undef FC_FUNC
+
+/* Define to a macro mangling the given C identifier (in lower and upper
+   case), containing underscores, for linking with Fortran. */
+#undef FC_FUNC_
+
+/* Fortran names are lowercase with no trailing underscore */
+#undef FC_NAME_LOWER
+
+/* Fortran names are lowercase with two trailing underscores */
+#undef FC_NAME_LOWER_2USCORE
+
+/* Fortran names are lowercase with two trailing underscores in stdcall */
+#undef FC_NAME_LOWER_2USCORE_STDCALL
+
+/* Fortran names are lowercase with no trailing underscore in stdcall */
+#undef FC_NAME_LOWER_STDCALL
+
+/* Fortran names are lowercase with one trailing underscore */
+#undef FC_NAME_LOWER_USCORE
+
+/* Fortran names are lowercase with one trailing underscore in stdcall */
+#undef FC_NAME_LOWER_USCORE_STDCALL
+
+/* Fortran names preserve the original case */
+#undef FC_NAME_MIXED
+
+/* Fortran names preserve the original case in stdcall */
+#undef FC_NAME_MIXED_STDCALL
+
+/* Fortran names preserve the original case with one trailing underscore */
+#undef FC_NAME_MIXED_USCORE
+
+/* Fortran names preserve the original case with one trailing underscore in
+   stdcall */
+#undef FC_NAME_MIXED_USCORE_STDCALL
+
+/* Fortran names are uppercase */
+#undef FC_NAME_UPPER
+
+/* Fortran names are uppercase in stdcall */
+#undef FC_NAME_UPPER_STDCALL
+
+/* Define to 1 if you have the `getcpu' function. */
+#undef HAVE_GETCPU
+
+/* Define to 1 if you have the <hwloc.h> header file. */
+#undef HAVE_HWLOC_H
+
+/* Define if hwloc library is available */
+#undef HAVE_HWLOC_LIB
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define if llapi_file_open in lustreapi */
+#undef HAVE_LLAPI_FILE_OPEN
+
+/* Define to 1 if you have the <lustre/lustreapi.h> header file. */
+#undef HAVE_LUSTRE_LUSTREAPI_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the <mpi.h> header file. */
+#undef HAVE_MPI_H
+
+/* Define if /proc/cpuinfo is readable */
+#undef HAVE_PROC_CPUINFO
+
+/* Define to 1 if you have the `sched_getaffinity' function. */
+#undef HAVE_SCHED_GETAFFINITY
+
+/* Define to 1 if you have the `sched_getcpu' function. */
+#undef HAVE_SCHED_GETCPU
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the `sysctlbyname' function. */
+#undef HAVE_SYSCTLBYNAME
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define when simple topology routines available */
+#undef HAVE_TOPOINIT
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the <utmpx.h> header file. */
+#undef HAVE_UTMPX_H
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define calling convention */
+#undef STDCALL
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to `__inline__' or `__inline' if that's what the C compiler
+   calls it, or to nothing if 'inline' is not supported under any name.  */
+#ifndef __cplusplus
+#undef inline
+#endif
+
+/* Define to the equivalent of the C99 'restrict' keyword, or to
+   nothing if this is not supported.  Do not define if restrict is
+   supported directly.  */
+#undef restrict
+/* Work around a bug in Sun C++: it does not support _Restrict or
+   __restrict__, even though the corresponding Sun C compiler ends up with
+   "#define restrict _Restrict" or "#define restrict __restrict__" in the
+   previous line.  Perhaps some future version of Sun C++ will work with
+   restrict; if so, hopefully it defines __RESTRICT like Sun C does.  */
+#if defined __SUNPRO_CC && !defined __RESTRICT
+# define _Restrict
+# define __restrict__
+#endif
+
+/* Define to empty if the keyword `volatile' does not work. Warning: valid
+   code using `volatile' can become incorrect without. Disable with care. */
+#undef volatile

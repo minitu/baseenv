@@ -1,0 +1,68 @@
+A first attempt at creating performance tests for compiling loops for
+GPUs. The source of these is expected to be the vectorization test suite,
+but with a different and more modular approach to setup and testing.
+
+Notes:
+There are several different options to consider here:
+Data Movement:
+    Options: Include data motion or exclude
+Loop parallelization (OpenACC)
+    Options: Explicit loop, "kernel"
+    define ACC_USE_KERNELS to use kernels version, otherwise uses loop.
+    Query: Do we need to use devicetype(nvidia) or devicetype(host) anywhere?
+
+Loop parallelization (OpenMP)
+
+For OpenMP and accelerators, compiler options may be needed.  Here are some
+xlc: -qoffload -qsmp=omp
+
+
+Build options:
+Add definitions using EXTRAFLAGS="..." ; this ensures that they are captured
+in the output from the test program.
+
+General:
+    default BASETYPE     - Use float
+    -DBASETYPE=double    - Use double instead of float
+    -DLEN=n              - Array len and placement. Several reasonable values
+                           are:
+                           a) 32000*ncores (vectors in L2)
+                           b) 2GB/sizeof(BASETYPE)/number-of-vectors; this
+                              would typically be 2GB/4/8 = 2^31/2^5 = 2^26
+                              = 64M words
+                           c) 2M (32MB for just 2 vectors, larger than most L2).
+                              Pick to be larger than cache (including L3 if
+			      present)
+    Note that all but the smallest may require dynamic allocation of storage
+    -DUSE_DYNAMIC_ALLOC    - Dynamically allocate, with a given memory
+                             alignment (16 bytes set in code)
+    -DNUM_CORES=n          - Number of cores to use; only when using the
+                             host.  An environment variable may also need to
+			     be set
+
+OpenACC:
+    default              - Use OpenACC with parallel constructs
+    -DUSE_ACC_KERNELS=1  - Use the general "kernels" approach for the timed
+                           loop rather than the more programmer-directed use
+                           of parallel loops
+
+    Only for PGI compiler:
+    COMPILER_ARCH=multicore - Compile for the host multicore processor
+         Also set -DDEVICE_IS_HOST=1
+    COMPILER_ARCH=tesla     - Compile for the Tesla GPU
+
+OpenMP:
+    Under investigation
+
+Need a run script to gather data.  See "runtests"; runtests.sbatch is designed
+as a batch submissions script after the applications are built.
+
+OpenACC. For example
+    GPU: make COMPILER_ARCH=tesla COMPILER_FAMILY=pgi
+    Parellel
+    Kernels (-DUSE_ACC_KERNELS=1)
+    Host: make COMPILER_ARCH=multicore COMPILER_FAMILY=pgi
+
+
+
+

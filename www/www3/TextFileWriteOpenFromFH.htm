@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML3.2 EN">
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" CONTENT="DOCTEXT">
+<TITLE>TextFileWriteOpenFromFH</TITLE>
+</HEAD>
+<BODY BGCOLOR="FFFFFF">
+<A NAME="TextFileWriteOpenFromFH"><H1>TextFileWriteOpenFromFH</H1></A>
+Associate a TextFile with an open FILE handle 
+<H2>Synopsis</H2>
+<PRE>
+int TextFileWriteOpenFromFH(MPI_Comm comm, int root, FILE *fp, MPI_Info info,
+                          TextFile *fh_p)
+</PRE>
+<H2>Input Parameters</H2>
+<DL>
+<DT><B>comm </B><DD>MPI Communicator of all processes that will perform text writes
+
+<DT><B>root </B><DD>Rank of process (in <tt>comm</tt>) that will perform I/O to the file
+
+<DT><B>fp   </B><DD>Already open for writing FILE.  A common use is with <tt>stdout
+</tt>
+<DT><B>info </B><DD>MPI Info object that may be used for opening the file.  Use
+<tt>MPI_INFO_NULL</tt> for no special behavior.
+</DL>
+<P>
+<H2>Output Parameter</H2>
+<DL><DT><B>fh_p </B> <DD> Pointer to a <tt>TextFile
+</tt>
+</DL>
+<P>
+<H2>Return value</H2>
+An error code.  Currently, <tt>MPI_SUCCESS</tt> is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.
+<P>
+</BODY></HTML>

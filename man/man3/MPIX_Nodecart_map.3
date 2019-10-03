@@ -1,0 +1,46 @@
+.TH MPIX_Nodecart_map 3 "1/3/2019" " " ""
+.SH NAME
+MPIX_Nodecart_map \-  Maps process to Cartesian topology information 
+.SH SYNOPSIS
+.nf
+int MPIX_Nodecart_map(MPI_Comm comm, int ndims, const int dims[],
+const int periods[], int *newrank)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B comm 
+- input communicator (handle)
+.PD 1
+.PD 0
+.TP
+.B ndims 
+- number of dimensions of Cartesian structure (integer)
+.PD 1
+.PD 0
+.TP
+.B dims 
+- integer array of size 
+.I ndims
+specifying the number of processes in
+each coordinate direction
+.PD 1
+.PD 0
+.TP
+.B periods 
+- logical array of size 
+.I ndims
+specifying the periodicity
+specification in each coordinate direction
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B newrank 
+- reordered rank of the calling process; 
+.I MPI_UNDEFINED
+if
+calling process does not belong to grid (integer)
+.PD 1
+

@@ -1,0 +1,53 @@
+.TH topoGetMethodsDesc 3 "4/23/2018" " " ""
+.SH NAME
+topoGetMethodsDesc \-  Return the description string for the currently selected topology methods 
+.SH SYNOPSIS
+.nf
+int topoGetMethodsDesc(const char **nodestr, const char **netstr)
+.fi
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B nodestr 
+- Describes the method used to determine the node topology
+.PD 1
+.PD 0
+.TP
+.B netstr  
+- Describes the method used to determine the interconnect topology
+.PD 1
+*/
+int topoGetMethodsDesc(const char **nodestr, const char **netstr)
+{
+*nodestr = topoNodeFns[nodeFnsIdx].descString;
+*netstr  = topoNetFns[netFnsIdx].descString;
+return 0;
+}
+
+
+/*@
+topoDebug - Select a virtual topology to return
+
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B kind 
+- Kind of topology to return.
+.PD 1
+
+.SH RETURN VALUE
+0 on success, non-zero on failure.
+
+.SH NOTES
+Normally, the topo routines return information about the real topology
+of the underlying hardware.  However, this can make debugging programs
+that want to make use of these routines difficult, since the tests would
+have to be run on the target hardware system.  This routine allows the
+use of dummy, virtual topologies.  Valid values for 
+.I kind
+include:
+.nf
+kind = 1: Use a multiple of 8 processes, provide a Cray XE6-like
+topology
+.fi
+

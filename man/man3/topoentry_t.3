@@ -1,0 +1,48 @@
+.TH topoentry_t 3 "4/23/2018" " " ""
+.SH NAME
+topoentry_t \-  Structure containing information about a level of the system topology 
+.SH SYNOPSIS
+.nf
+typedef struct topoentry_t {
+topoType_t  topoType;      /* e.g., unknown, torus, mesh, bus, tree */
+int         dim;           /* number of dimensions in topology */
+topoCoord_t coords;        /* coordinates in topology */
+topoCoord_t maxtopocoords; /* maximum value of valid coordinate in
+topology */
+topoCoord_t maxcoords;     /* maximum value of valid coordinates */
+topoCoord_t mincoords;     /* minimum value of valid coordinates */
+struct topoentry_t *next;
+} topoentry_t;
+.fi
+.SH NOTES
+This structure may be examined by the user to determine properties of the
+system topology.  Most systems will have at least two levels, with 
+.I topoType
+'TOPO_CORE
+and 
+.I TOPO_CHIP
+\&.
+Additional levels may include 
+.I TOPO_NODE
+and
+for systems with a high performance mesh interconnect, 
+.I TOPO_MESH
+\&.
+Other
+topology types are defined.
+
+Each level may have siblings (e.g., cores on the same chip), children
+(e.g., cores of the chip), and parents (e.g., the node hosting a chip).
+Coordinates are provided to identify siblings.  For simple arrangements,
+such as cores on a chip, this is just a numbering starting from zero;
+specifically, a one-tuple.  For a 
+.I TOPO_MESH
+or 
+.I TOPO_TORUS
+topology,
+the coordinates will be an n-tuple, for an n-Dimensional mesh.
+
+The source code for the routine 
+.I topoPrint
+shows how to use some of the
+fields in this structure.

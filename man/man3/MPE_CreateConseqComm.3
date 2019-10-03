@@ -1,0 +1,26 @@
+.TH MPE_CreateConseqComm 3 "4/23/2018" " " ""
+.SH NAME
+MPE_CreateConseqComm \-  Create a communiator for all processes where process  are consequtive on each node. 
+.SH SYNOPSIS
+.nf
+int MPE_CreateConseqComm( MPI_Comm comm, MPI_Comm *rrcomm, int *nnodes )
+.fi
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B comm 
+- Communicator of processes
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B rootComm 
+- Communicator of processes, consequetive on each node
+.PD 1
+.PD 0
+.TP
+.B nnodes   
+- My node number
+.PD 1
+

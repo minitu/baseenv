@@ -1,0 +1,29 @@
+.TH topoPrint 3 "4/23/2018" " " ""
+.SH NAME
+topoPrint \-  Print basic information about the topology 
+.SH SYNOPSIS
+.nf
+int topoPrint(FILE *fp, const char *leader, topoinfo_t *topo)
+.fi
+.SH INPUT PARAMETERS
+.PD 0
+.TP
+.B fp 
+- FILE pointer for output
+.PD 1
+.PD 0
+.TP
+.B leader 
+- string to prepend each line of output
+.PD 1
+.PD 0
+.TP
+.B topo 
+- pointer to topology info
+.PD 1
+
+.SH RETURN VALUE
+0 on success, non-zero on failure.
+
+.SH THREAD SAFETY
+This routine is not thread safe.

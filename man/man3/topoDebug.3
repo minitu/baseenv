@@ -1,0 +1,28 @@
+.TH topoDebug 3 "7/11/2016" " " ""
+.SH NAME
+topoDebug \-  Select a virtual topology to return 
+.SH SYNOPSIS
+.nf
+int topoDebug(int kind)
+.fi
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B kind 
+- Kind of topology to return.
+.PD 1
+
+.SH RETURN VALUE
+0 on success, non-zero on failure.
+
+.SH NOTES
+Normally, the topo routines return information about the real topology
+of the underlying hardware.  However, this can make debugging programs
+that want to make use of these routines difficult, since the tests would
+have to be run on the target hardware system.  This routine allows the
+.SH USE OF DUMMY, VIRTUAL TOPOLOGIES.  VALID VALUES FOR 'KIND' INCLUDE
+.nf
+kind = 1: Use a multiple of 8 processes, provide a Cray XE6-like
+topology
+.fi
+

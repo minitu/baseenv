@@ -1,0 +1,170 @@
+This directory contains programs that are part of the mpptest performance
+test suite.  By default, they generate output for the C.It graphics program;
+the -gnuplot option will generate data for Gnuplot.  Because of limitations
+of Gnuplot, the full generality of these commands is not supported when
+gnuplot output is selected.
+
+The best way to use this is a part of the "baseenv" environment.  Use the
+configure in the toplevel directory to configure all of the packages.
+It is possible to use the configure in this directory alone, but not all
+features will be supported.
+
+There are several types of tests included here:
+   Communication tests
+   Multicore computation tests
+
+The Communication Performance Test Programs
+-------------------------------------------
+The programs that you want to run are mpptest and goptest; mstream may
+be useful as well.  You can run
+these as you would any MPI program, or you can use the following scripts
+that will generate data automatically.  To use these, you will also need
+to create a script that runs an MPI program with some arguments;
+samples are provided for IBM's MPI in mpirun.ibm .
+
+For a quick overview of the performance of your system, try
+
+   mpiexec -n 2 mpptest -logscale
+   mpiexec -n 16 mpptest -bisect -logscale
+
+(the latter assumes that you have 16 processors).
+
+Several scripts have been provided to generate data.  The following two 
+run mpptest and goptest with common options.
+
+runmpptest - point-to-point tests and collective as a function of data length
+rungoptest - collective as a function of the number of processes
+
+To get an idea about your system, do (assuming a 32 processor system)
+
+./runmpptest -short -pair -blocking -givedy -gnuplot -fname pt2pt.mpl
+./runmpptest -np 32 -bisect -short -blocking -gnuplot -fname bisect.mpl
+./rungoptest -maxnp 32 -add -bcast -gnuplot -fname bcast.mpl
+
+(use 
+    -mpirunpgm ./mpirun.ibm 
+ to select an alternate mpirun program (mpirun.ibm in this case)
+)
+Then
+
+gnuplot pt2pt.mpl
+gnuplot bisect.mpl
+gnuplot bcast.mpl
+
+will generate plots of the performance of MPI_Send/MPI_Recv, (point to point
+and bisection bandwidth) and MPI_Bcast.  These routines may be used for 
+additional testing.  For example,
+
+./runmpptest -long -pair -nonblocking -givedy -gnuplot -fname nbpt2pt.mpl
+
+will give the performance of the nonblocking MPI routines with long messages.
+
+The script basetest can be used to get common information about your 
+system for both point-to-point and collective calls.  It 
+
+In addition, mpptest and goptest may be used alone.  Both take -help and give
+a summary of options.  For example, 
+
+./mpptest -sz 2 -cachesize 1000000
+
+causes the messages to be taken from a buffer of size 1000000, reducing the 
+reuse of memory locations.
+
+The copytest program gives a rough estimate of how fast memcpy works in a
+single address space.  To use
+
+mpiexec -n 1 copytest
+
+This copies data from one place to another three times; the first copy
+may take longer because of the need to page in (and possibly initialize to
+zero) data.  If the data cache is large enough, the second and third copies
+may be faster than expected.
+
+(You need to use mpirun because copytest uses MPI_Wtime to get times)
+
+Finally, the program buflimit is a simple program that estimates the size
+of message that you can send with an MPI_Send without having a matching 
+receive (i.e., messages sizes that are sent eagerly).  Just run
+
+mpiexec -n 2 buflimit
+
+The following uses of runmpptest and rungoptest will produce a basic survey 
+of your system.  This script can be placed in a file and executed.
+
+-- cut here --
+#! /bin/sh
+./runmpptest -short -pair -blocking -givedy -gnuplot -fname pt2ptshort.mpl
+./runmpptest -long -pair -blocking -givedy -gnuplot -fname pt2ptlong.mpl
+./runmpptest -long -pair -nonblocking -givedy -gnuplot -fname nbpt2ptlong.mpl
+./runmpptest -np 32 -bisect -short -blocking -gnuplot -fname bisectshort.mpl
+./runmpptest -np 32 -bisect -long -blocking -gnuplot -fname bisectlong.mpl
+./rungoptest -maxnp 32 -add -bcast -gnuplot -fname bcast.mpl
+temp=`which $gnuplot | head -1`
+if [ ! -x "$temp" ] ; then
+   echo "Creating tar file of plot data"
+   tar cf data.tar *.mpl *.???
+else 
+    for file in *.mpl ; do
+        filebase=`basename $file`
+        # Use set terminal postscript eps 
+        # to get encapsulated Postscript for including in documents
+        gnuplot <<EOF >>${filebase}.ps
+set terminal postscript
+load $file
+EOF
+        echo "Created file ${filebase}.ps"
+    end
+fi
+-- cut here --
+
+If you have access to the graphics program C.It (very few of you will), 
+you can get slightly nicer output, as well as more easily getting "rate"
+graphs.
+
+To do this, do the following:
+
+Use -cit instead of -gnuplot as the option to mpptest.  Add the -rate 
+option to mpptest.
+
+For example, the basic performance plots for latency and bandwidth, 
+using C.It output form, can be generated with
+
+mpiexec -n 2 mpptest -cit -auto -autodx 4 > short.cit
+mpiexec -n 2 mpptest -cit -rate -size 16000 1600000 16000 > long.cit 
+
+Nonblocking versions are
+
+mpiexec -n 2 mpptest -cit -async -auto -autodx 4 > short.cit
+mpiexec -n 2 mpptest -cit -async -rate -size 16000 1600000 16000 > long.cit 
+
+Halo or GhostCell Exchange Tests
+--------------------------------
+To test halo exchanges with various forms of MPI-2 RMA optimizations, as well
+as non-blocking MPI_Isend/Irecv, use the script runhalo.  This will store the
+results (in gnuplot format, two files per test) in the tar file halo4.tar .
+
+In addition, the results are placed, in tab-separated format, into the file 
+halo4.txt .  This file is suitable for inclusion in a spreadsheet for further 
+processing.
+
+The halo test by default uses 4 processes (hence the "4" in the file names).
+You can change this with the -n option; for example, to use 8 processes, 
+use
+
+   ./runhalo -n=8
+
+The -v option will print out which family of tests is running as the script 
+executes.  The test will run with 2, 4, and 8 neighbor processes as long as 
+the number of processes is at least as great as the number of neighbors.  
+When using runhalo to evaluate halo exchange times, select a value for the -n
+argument that is similar to what will be used in applications (e.g., use
+
+    ./runhalo -n=32
+
+if you expect to typically use 32 processes in MPI_COMM_WORLD).
+
+Multicore Tests
+---------------
+The two tests mstream and mspmv provide a memory performance (similar
+to STREAM) and a memory-bound compute performance (based on sparse
+matrix-vector multiply).

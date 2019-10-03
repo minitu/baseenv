@@ -1,0 +1,137 @@
+Vectorization test
+
+To run this test, do these steps:
+
+./configure
+(or 
+  ./configure CC=compiler
+to select a particular compiler, for example, ./configure CC=icc for the Intel
+compiler)
+
+For Intel architectures
+    make COMPILER_FAMILY=name
+and for others
+    make COMPILER_FAMILY=name COMPILER_ARCH=archname
+where name is one of
+  cray
+  clang
+  gcc
+  intel
+  pgi
+  xlc
+  generic
+
+and archname is one of (depends on COMPILER_FAMILY):
+ for gcc
+   sse42    (Generic x86 with SSE4.2 instructions; also the default)
+   avx2
+   skylake
+   power8
+   power9
+ for xlc
+   bgq
+   power7
+   power8
+   power9
+
+
+ (not yet implemented)
+  amd-epyc
+
+Finally, to run the tests (see below for how to run them and automate the
+comparison of vector and non-vector runs),
+
+./runvec
+./runnovec
+
+Each run will produce a tab-delimited list of results suitable for importing
+into an analysis program or spreadsheet.
+
+Note that these tests can take a long time to run.  On a 2.6GHz processor,
+almost an hour was required to run the no-vector version.
+
+The script mergeresults can be used to create a single output file with
+results from both tests, including the performance ratio:
+
+    ./runvec > runvec.txt
+    ./runnovec > runnovec.txt
+    ./mergeresults runvec.txt runnovec.txt > results.txt
+
+This is a tab-delimited file suitable for importing into a spreadsheet program.
+If you want to compare multiple compilers on the same platform, use the
+above sequence of operations to get a results file for each compiler and then
+use the script mergesheets to combine them into a single tab-separated file.
+For example, if results for the Cray compiler were in cray.txt and for the GNU
+compiler in gcc.txt, use
+
+    ./mergesheets cray:cray.txt gcc:gcc.txt > compare.txt
+
+to produce a single file comparing the compilers.  The arguments to
+mergesheets are of the form "Name:file", where "Name" is used to label the
+results and "file" is the output from mergeresults.  A summary is included
+at the bottom that shows how many tests were vectorized by each combination
+of compilers (e.g., how many vectorized by all compilers, how many only by
+one compiler).
+
+Where possible, the compilation step will produce a report of how well the
+compiler vectorized. This file will be named following the conventions of the
+compiler, so you may need to look for it.
+
+To add new compilers to the test:
+If all that is necessary are a new set of options, these can be added to the
+Makefile.in following this pattern:
+
+ifeq "$(COMPILER_FAMILY)" "new-name"
+# icc
+flags = <common flags, such as optimization>
+vecflags = <flags only for vectorization>
+novecflags = <flags that suppress all vectorization>
+endif
+
+Please send this information to the maintainers.
+
+Options:
+
+Controling the number of times each test is run
+-----------------------------------------------
+Configure with --enable-ntimes.  Then you may use the option "-ntimes n",
+for example
+
+   ./runvec -ntimes 1000
+
+Controlling the output of descriptive information
+-------------------------------------------------
+The option -nodesc to the programs will suppress the output of a short
+description of each test (at this time, not all tests have a short
+description).  For example,
+
+   ./runvec -nodesc
+
+Using C's restrict
+------------------
+configure should figure out how to define restrict for your compiler.
+If it fails, you can edit the tscdef.h file.  Please also notify us
+and file a bug report against autoconf.
+
+Changing the datatype
+---------------------
+By default, the tests are performed using floats.  This is
+appropriate, since for most systems, the vector width is fixed and
+there are twice as many floats as doubles in a vector register.  As a
+result, the benefits of vectorization are most apparent with floats.
+However, many applications use doubles exclusively.  To test the
+vectorization of computations with doubles, define BASETYPE as double.
+You can do this with:
+
+   configure --enable-basetype=double
+
+You can also simply change the definition of BASETYPE in tsc.c .  However,
+if you do this, you must also change the definition of BASETYPE_VAL to
+match the choice of BASETYPE.  Using the configure option will ensure that
+both are changed consistently.
+
+Troubleshooting
+There are some uses of inline functions.  At least one version of gcc fails
+to handle these properly but still claims to support inline.  In that case,
+just comment out the "inline" in the routine definitions.
+

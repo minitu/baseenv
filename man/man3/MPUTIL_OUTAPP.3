@@ -1,0 +1,43 @@
+.TH MPUTIL_OUTAPP 3 "1/3/2019" " " ""
+.SH NAME
+MPUTIL_OUTAPP \-  Append output to a row of output 
+.SH INPUT PARMETERS
+.PD 0
+.TP
+.B args 
+- printf style arguments (varargs).
+.PD 1
+
+.SH NOTES
+This macro should be called after 
+.I MPUTIL_LABEL
+to add data to the row
+of output data. A newline ('\\n') should be used for the last value
+intended for the row.
+
+When used to benchmark on muiltiple cores, the macros 
+.I MPUTIL_LABEL
+and 
+.I MPUTIL_OUTALL
+together should be used to output timing data.
+When used on a single core (the non-parallel option), each acts like
+.I printf
+\&.
+In the parallel case, the output has one column containing the
+data specified by 
+.I MPUTIL_OUTAPP
+for each number of active cores; the
+leftmost column is the text provided by 
+.I MPUTIL_LABEL
+\&.
+
+
+The output from both 
+.I MPUTIL_LABEL
+and 
+.I MPUTIL_OUTAPP
+is generated
+when the timing block is completed with 
+.I MPUTIL_END
+\&.
+

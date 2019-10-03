@@ -1,0 +1,32 @@
+.TH MPE_CreateSMPComm 3 "4/23/2018" " " ""
+.SH NAME
+MPE_CreateSMPComm \-  Create a communicator for the processes on the same node 
+.SH SYNOPSIS
+.nf
+int MPE_CreateSMPComm( MPI_Comm comm, 
+MPI_Comm *localComm, MPI_Comm *rootComm, int *nnodes )
+.fi
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B comm 
+- Communicator of processes
+.PD 1
+
+.SH OUTPUT PARAMETERS
+.PD 0
+.TP
+.B localComm 
+- Communicator of processes on the same node 
+.PD 1
+.PD 0
+.TP
+.B rootComm 
+- Communicator of leaders on the different nodes
+.PD 1
+.PD 0
+.TP
+.B nnodes   
+- My node number
+.PD 1
+

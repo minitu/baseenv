@@ -1,0 +1,30 @@
+.TH TextFileWriteFlush 3 "4/23/2018" " " ""
+.SH NAME
+TextFileWriteFlush \-  Flush all pending output to a TextFile 
+.SH SYNOPSIS
+.nf
+int TextFileWriteFlush(TextFile fh)
+.fi
+.SH INPUT PARAMETER
+.PD 0
+.TP
+.B fh 
+- TextFile handle
+.PD 1
+
+.SH NOTES
+This is a collective routine that must be called by every process in the
+communicator that was used to open the 
+.I TextFile
+handle 
+.I fh
+\&.
+
+
+.SH RETURN VALUE
+An error code.  Currently, 
+.I MPI_SUCCESS
+is returned on success and an
+MPI error class is returned on failure.  A future implementation may
+return a user-defined MPI error code.
+

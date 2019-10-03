@@ -1,0 +1,124 @@
+ALL: all-redirect
+
+# Set the basic directories
+prefix           = @prefix@
+exec_prefix      = @exec_prefix@
+datarootdir      = @datarootdir@
+abs_builddir     = @abs_builddir@
+abs_top_builddir = @abs_top_builddir@
+builddir         = @builddir@
+top_builddir     = @top_builddir@
+abs_srcdir       = @abs_srcdir@
+abs_top_srcdir   = @abs_top_srcdir@
+
+includedir       = @includedir@
+libdir           = @libdir@
+bindir           = @bindir@
+
+master_top_builddir = @master_top_builddir@
+master_top_srcdir   = @master_top_srcdir@
+include $(master_top_srcdir)/Makefile.doc
+
+MPICC  = @CC@
+CFLAGS = @CFLAGS@
+CPPFLAGS = @CPPFLAGS@
+LDFLAGS = @LDFLAGS@
+COPT = @COPT@
+FCOPT = @FCOPT@
+#EXTRA_LIBS = /Users/gropp/tmp/fpmpi/libfpmpi.a
+EXTRA_LIBS = @LIBS@
+#CFLAGS = -qarch=440 -qtune=440 -O3
+
+MKDIR_P         = @MKDIR_P@
+INSTALL         = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA    = @INSTALL_DATA@
+DOCTEXT         = @DOCTEXT@
+
+GENERATEDFILES = haloperf.h
+
+halocompare_HEADERS = halocompare.h irecv.h persist.h phased.h \
+	waitall.h
+#meshtopo.h
+halocompare_SOURCES = halocompare.c $(HALO_METHODS)
+#  meshtopo.c
+packtest_SOURCES    = packtest.c packfunc.c
+packtest_HEADERS    = packfunc.h
+nodecomm_SOURCES    = nodecomm.c ndummy.c
+
+SOURCES      = $(halocompare_SOURCES) $(packtest_SOURCES) $(nodecomm_SOURCES)
+HEADER_FILES = $(halocompare_HEADERS) $(packtest_HEADERS)
+DIST_COMMON  = configure.ac configure aclocal.m4 haloperf.h.in Makefile.in
+DOC_FILES    = README
+DOC_SOURCES  =
+
+.c.o:
+	$(MPICC) $(CFLAGS) $(COPT) $(CPPFLAGS) -c $<
+
+halocompare_OBJECTS = $(halocompare_SOURCES:.c=.o)
+packtest_OBJECTS    = $(packtest_SOURCES:.c=.o)
+nodecomm_OBJECTS    = $(nodecomm_SOURCES:.c=.o)
+
+EXECS = halocompare nodecomm packtest
+
+all-redirect: baseenvprogs
+
+baseenvlib:
+baseenvprogs: $(EXECS)
+
+HALO_METHODS = waitall.c irecv.c persist.c phased.c
+
+$(helocompare_OBJECTS): $(halocompare_HEADERS)
+$(packtest_OBJECTS): $(packtest_HEADERS)
+
+halocompare: $(halocompare_OBJECTS)
+	$(MPICC) $(CFLAGS) $(COPT) $(CPPFLAGS) -o halocompare \
+	$(halocompare_OBJECTS) $(LDFLAGS) $(EXTRA_LIBS)
+
+packtest: $(packtest_OBJECTS)
+	$(MPICC) $(CFLAGS) $(COPT) $(CPPFLAGS) -o packtest \
+	$(packtest_OBJECTS) $(LDFLAGS) $(EXTRA_LIBS)
+
+nodecomm: $(nodecomm_OBJECTS)
+	$(MPICC) $(CFLAGS) $(COPT) $(CPPFLAGS) -o nodecomm \
+		$(nodecomm_OBJECTS) $(LDFLAGS) $(EXTRA_LIBS)
+clean:
+	rm -f *.o *~ nodecomm-mapping.txt
+
+realclean: clean
+	rm -f $(EXECS)
+
+distclean: realclean
+	rm -f config.log config.status $(GENERATEDFILES) *.a
+	rm -rf autom4te.cache
+
+dist:
+	@if [ "X$(distdir)" == "X" ] ; then echo "Set distdir" ; exit 1 ; fi
+	@if [ ! -d $(distdir) ] ; then mkdir $(distdir) ; fi
+	cp $(SOURCES) $(distdir)
+	cp $(HEADER_FILES) $(distdir)
+	cp $(DIST_COMMON) $(distdir)
+	if [ "X$(DOC_FILES)" != "X" ] ; then cp $(DOC_FILES) $(distdir) ; fi
+
+# Documentation targets
+mandoc: $(mandoc_path1) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_MAN_OPTIONS) -mpath $(mandoc_path1) -ext 1 \
+		$(DOC_SOURCES)
+htmldoc: $(htmldoc_path1) $(DOC_SOURCES)
+	$(DOCTEXT) $(DOCTEXT_HTML_OPTIONS) -mpath $(htmldoc_path1) \
+		$(DOC_SOURCES)
+
+install:
+	for program in $(EXECS) ; do \
+	    $(INSTALL_PROGRAM) $$program $(DESTDIR)$(bindir)/$$program ; done
+
+Makefile: Makefile.in ./config.status
+	./config.status --file=Makefile
+
+AUTOCONF = @AUTOCONF@
+AUTOHEADER = @AUTOHEADER@
+configure: configure.in
+	$(AUTOCONF) -I config/confdb
+	$(AUTOHEADER) -I config/confdb
+
+.phony: baseenvlib baseenvprogs clean realclean distclean mandoc htmldoc

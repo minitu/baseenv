@@ -1,0 +1,1 @@
+int setupPersistTest( HaloTest *self );
